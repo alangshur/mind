@@ -3,7 +3,11 @@
 
 #include <queue>
 #include <string>
+#include <atomic>
+#include <utility>
 #include <unistd.h>
+#include "orchestrator.h"
+#include "manager/semaphore.h"
 
 /*
     The engine ingestor class monitors a piped file descriptor
@@ -13,16 +17,22 @@
 */
 class EngineIngestor {
     public:
+        EngineIngestor(int read_fd, int write_fd);
+        ~EngineIngestor();
         void run_ingestion();
-        EngineIngestor(int fd);
-        std::queue<std::string> new_queue;
-        std::queue<std::string> update_queue;
+        void shutdown_ingestor();
+
+        std::atomic<std::queue<std::pair<cid, cid>>*> new_queue;
+        std::atomic<std::queue<std::pair<cid, cid>>*> update_queue;
+        EffSemaphore new_queue_sem;
+        EffSemaphore update_queue_sem;
         
     private:
+        std::pair<cid, cid> read_fd_packet();
+
+        std::atomic<bool> shutdown_flag; 
         int input_fd;
-        ~EngineIngestor() {
-            close(this->input_fd);
-        }
+        int self_input_fd;
 };
 
 #endif
