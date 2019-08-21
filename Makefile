@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall
+CXXFLAGS = -std=c++17 -Wall -O3
 # CXXFLAGS_WARN_OFF += -Wno-unused-private-field
 INCLUDE = -Iinclude
 MODULES = $(shell find src -name *.cpp)
