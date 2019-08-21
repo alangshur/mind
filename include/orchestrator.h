@@ -10,6 +10,6 @@ typedef int16_t elo;
 // define engine manager paramaters
 const size_t INGEST_PACKET_BYTES = 14;
 const size_t INGEST_CID_BYTES = 6;
-const string SHUTDOWN_SIGNAL = "000000 000000 ";
+const char* const SHUTDOWN_PACKET = "000000 000000";
 
 #endif

@@ -37,7 +37,7 @@ void EngineIngestor::run_ingestion() {
 
 void EngineIngestor::shutdown_ingestor() {
     this->shutdown_flag = true;
-    write(this->self_input_fd, SHUTDOWN_SIGNAL, INGEST_PACKET_BYTES);
+    write(this->self_input_fd, SHUTDOWN_PACKET, INGEST_PACKET_BYTES);
 }
 
 pair<cid, cid> EngineIngestor::read_fd_packet() {
@@ -46,7 +46,7 @@ pair<cid, cid> EngineIngestor::read_fd_packet() {
     char* end_ptr;
 
     // read packet
-    cout << read(this->input_fd, buf, INGEST_PACKET_BYTES);
+    read(this->input_fd, buf, INGEST_PACKET_BYTES);
     first = (cid) strtol(buf, &end_ptr, 10);
     second = (cid) strtol(end_ptr, NULL, 10);
     return pair<cid, cid>(first, second);
