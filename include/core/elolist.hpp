@@ -21,6 +21,7 @@ class EloList {
         c_node* add_contribution(cid id);
         void remove_contribution(c_node* node);
         cid cycle_front_contribution();
+        void free_list_memory();
     
     private:
         c_node* head;

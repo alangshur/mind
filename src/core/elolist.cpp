@@ -75,3 +75,14 @@ cid EloList::cycle_front_contribution() {
         return cycle->id;
     }
 }
+
+void EloList::free_list_memory() {
+    if (this->total_nodes == 0) return;
+    lock_guard<mutex> lg(this->list_mutex);
+    
+    // iteratively remove nodes
+    while (this->total_nodes > 0) {
+        c_node* curr_node = this->head;
+        this->remove_contribution(curr_node);
+    }
+}

@@ -5,6 +5,12 @@ using namespace std;
 
 EloStore::EloStore() : store(vector<EloList>(ELO_STORE_SIZE)) {}
 
+EloStore::~EloStore() {
+    for (size_t i = 0; i < store.size(); i++) {
+        (this->store)[i].free_list_memory();
+    }
+}
+
 c_node* EloStore::add_contribution(cid contribution_id, elo init_rating) {
     
     // insert contribution and return position

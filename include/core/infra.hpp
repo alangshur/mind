@@ -43,7 +43,6 @@ class EloStore {
 class ContributionStore {
     public:
         ContributionStore(EloStore& elo_store);
-        ~ContributionStore();
         void add_contribution(cid contribution_id);
         void update_contribution(cid contribution_id, elo new_rating);
 
