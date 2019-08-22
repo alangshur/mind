@@ -3,8 +3,8 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
-#include "orchestrator.h"
-#include "manager/ingestion.h"
+#include "orchestrator.hpp"
+#include "manager/ingestion.hpp"
 using namespace std;
 
 int main(int argc, const char* argv[]) {

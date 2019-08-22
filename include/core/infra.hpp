@@ -4,7 +4,7 @@
 #include <vector>
 #include <queue>
 #include <atomic>
-#include "orchestrator.h"
+#include "orchestrator.hpp"
 
 typedef struct {
     cid contribution_id;

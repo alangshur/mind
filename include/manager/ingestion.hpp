@@ -6,8 +6,8 @@
 #include <atomic>
 #include <utility>
 #include <unistd.h>
-#include "orchestrator.h"
-#include "manager/semaphore.h"
+#include "orchestrator.hpp"
+#include "manager/semaphore.hpp"
 
 /*
     The engine ingestor class monitors a piped file descriptor

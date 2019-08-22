@@ -2,7 +2,7 @@
 #define SCORING_H
 
 #include <utility>
-#include "orchestrator.h"
+#include "orchestrator.hpp"
 
 /*
     The engine scorer class contains two static methods that are

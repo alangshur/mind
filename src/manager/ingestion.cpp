@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <chrono>
 #include <iostream>
-#include "orchestrator.h"
-#include "manager/ingestion.h"
+#include "orchestrator.hpp"
+#include "manager/ingestion.hpp"
 using namespace std;
 
 EngineIngestor::EngineIngestor(int read_fd, int write_fd) : 
