@@ -1,12 +1,30 @@
 #ifndef EXECUTOR_H
 #define EXECUTOR_H
 
-#include "orchestrator.h"
+#include "orchestrator.hpp"
+#include "manager/ingestion.hpp"
+#include "manager/semaphore.hpp"
+#include "core/scoring.hpp"
+#include "core/infra.hpp"
+#include "core/elolist.hpp"
 
-
+/*
+    The engine executor class pieces together the entire 
+    input pipeline for the engine algorithm. It fetches data 
+    (contributions and updates) that have been ingested and 
+    injects them into the stores framework defined within the 
+    engine core after running them through the ELO rating module.
+*/
 class EngineExecutor {
     public:
-        EngineExecutor();
+        EngineExecutor(EngineIngestor& ingestor, EngineScorer& scorer, 
+            EloStore& elo_store, ContributionStore& contribution_store);
+
+    private:
+        EngineIngestor& ingestor;
+        EngineScorer& scorer;
+        EloStore& elo_store;
+        ContributionStore& contribution_store;
 };
 
 #endif
