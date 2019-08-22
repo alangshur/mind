@@ -1,4 +1,5 @@
 #include <utility>
+#include <iostream>
 #include "math.h"
 #include "core/infra.hpp"
 using namespace std;
@@ -14,8 +15,7 @@ EloStore::~EloStore() {
 c_node* EloStore::add_contribution(cid contribution_id, elo init_rating) {
     
     // insert contribution and return position
-    return (this->store)[(int) init_rating]
-        .add_contribution(contribution_id);
+    return (this->store)[(int) init_rating].add_contribution(contribution_id);
 }
 
 c_node* EloStore::update_contribution(cid contribution_id, c_node* position, 

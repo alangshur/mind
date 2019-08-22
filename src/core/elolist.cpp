@@ -1,3 +1,4 @@
+#include <iostream>
 #include "core/elolist.hpp"
 using namespace std;
 
@@ -56,7 +57,7 @@ void EloList::remove_contribution(c_node* node) {
 
     // decrement counter
     delete node;
-    this->total_nodes++;
+    this->total_nodes--;
 }
 
 cid EloList::cycle_front_contribution() {

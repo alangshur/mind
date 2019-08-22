@@ -1,9 +1,10 @@
 #include <utility>
+#include <iostream>
 #include "core/executor.hpp"
 using namespace std;
 
-EngineExecutor::EngineExecutor(EngineIngestor& ingestor, EngineScorer& scorer, 
-    EloStore& elo_store, ContributionStore& contribution_store) : ingestor(ingestor), 
+EngineExecutor::EngineExecutor(EngineIngestor& ingestor, EloStore& elo_store, 
+    ContributionStore& contribution_store) : ingestor(ingestor), 
     contribution_store(contribution_store), ternary_shutdown_sem(EffSemaphore(0)), 
     shutdown_flag(false) {}
 
@@ -13,10 +14,23 @@ void EngineExecutor::run_contribution_pipeline() {
 
         // fetch and add new contribution
         this->ingestor.new_queue_sem.wait();
+
+        // start clock (TODO REMOVE)
+        using nano = std::chrono::nanoseconds;
+        auto start = std::chrono::high_resolution_clock::now();
+
         if (this->shutdown_flag) break;
         contribution_id = this->ingestor.new_queue.load()->front();
         this->contribution_store.add_contribution(contribution_id);
         this->ingestor.new_queue.load()->pop();
+
+        // stop clock (TODO REMOVE)
+        cout << endl << endl << "Added a new contribution with ID: " 
+            << contribution_id << ", ELO: "<< ELO_INITIAL_RATING << endl;
+        auto finish = std::chrono::high_resolution_clock::now();
+        cout << "New contribution pipeline time: " 
+            << chrono::duration_cast<nano>(finish - start).count()
+            << endl << endl << flush; 
     }
 
     // signal shutdown
@@ -30,6 +44,11 @@ void EngineExecutor::run_update_pipeline() {
 
         // fetch new update
         this->ingestor.update_queue_sem.wait();
+
+        // start clock (TODO REMOVE)
+        using nano = std::chrono::nanoseconds;
+        auto start = std::chrono::high_resolution_clock::now();
+
         if (this->shutdown_flag) break;
         contribution_ids = this->ingestor.update_queue.load()->front();
         this->ingestor.update_queue.load()->pop();
@@ -45,6 +64,17 @@ void EngineExecutor::run_update_pipeline() {
             contribution_elos.first);
         this->contribution_store.update_contribution(contribution_ids.second, 
             contribution_elos.second);
+
+        // stop clock (TODO REMOVE)
+        cout << endl << endl << "Applied the following updates: " << endl 
+            << "Winner ID: " << contribution_ids.first 
+            << ", ELO: " << contribution_elos.first << endl
+            << "Loser ID: " << contribution_ids.second 
+            << ", ELO: " << contribution_elos.second << endl;
+        auto finish = std::chrono::high_resolution_clock::now();
+        cout << "Update pipeline time: " 
+            << chrono::duration_cast<nano>(finish - start).count()
+            << endl << endl << flush; 
     }
 
     // signal shutdown

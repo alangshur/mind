@@ -7,7 +7,6 @@
 #include "manager/semaphore.hpp"
 #include "core/scoring.hpp"
 #include "core/infra.hpp"
-#include "core/elolist.hpp"
 
 /*
     The engine executor class pieces together the entire 
@@ -18,8 +17,8 @@
 */
 class EngineExecutor {
     public:
-        EngineExecutor(EngineIngestor& ingestor, EngineScorer& scorer, 
-            EloStore& elo_store, ContributionStore& contribution_store);
+        EngineExecutor(EngineIngestor& ingestor, EloStore& elo_store, 
+            ContributionStore& contribution_store);
         void run_contribution_pipeline();
         void run_update_pipeline();
         void shutdown_pipelines();
