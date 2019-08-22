@@ -14,7 +14,7 @@ const char* const SHUTDOWN_PACKET = "000000 000000";
 
 // define ELO parameters
 const elo ELO_INITIAL_RATING = 1000.0;
-const float ELO_K_FACTOR = 10.0;
+const float ELO_K_FACTOR = 4.0;
 const float ELO_N_SCALE = 400.0;
 const float ELO_EXP_BASE = 10.0;
 

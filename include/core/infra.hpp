@@ -48,7 +48,7 @@ class ContributionStore {
 
     private:
         EloStore& elo_store;
-        std::vector<contribution_t> store;
+        std::vector<std::atomic<contribution_t>> store;
 };
 
 #endif
