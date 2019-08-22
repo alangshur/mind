@@ -16,6 +16,10 @@ EngineIngestor::~EngineIngestor() {
     // close file descriptors
     close(this->input_fd); 
     close(this->self_input_fd);
+
+    // free memory
+    delete this->new_queue.load();
+    delete this->update_queue.load();
 }
 
 void EngineIngestor::run_ingestion() {

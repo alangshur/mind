@@ -5,6 +5,7 @@
 #include <ctime>
 #include "orchestrator.hpp"
 #include "manager/ingestion.hpp"
+#include "core/elolist.hpp"
 using namespace std;
 
 int main(int argc, const char* argv[]) {

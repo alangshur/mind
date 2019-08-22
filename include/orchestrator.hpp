@@ -8,8 +8,8 @@ typedef size_t cid;
 typedef float elo;
 
 // define manager paramaters
-const size_t INGEST_PACKET_BYTES = 14;
-const size_t INGEST_CID_BYTES = 6;
+const uint32_t INGEST_PACKET_BYTES = 14;
+const uint32_t INGEST_CID_BYTES = 6;
 const char* const SHUTDOWN_PACKET = "000000 000000";
 
 // define ELO parameters
@@ -19,8 +19,8 @@ const float ELO_N_SCALE = 400.0;
 const float ELO_EXP_BASE = 10.0;
 
 // define strucutre parameters
-const size_t ELO_STORE_SIZE = 5000;
-const size_t CONTRIBUTION_STORE_SIZE = 100000;
-const size_t INITIAL_CONTRIBUTION_COUNT = 0;
+const uint32_t ELO_STORE_SIZE = 10000;
+const uint32_t CONTRIBUTION_STORE_SIZE = 1000000;
+const uint32_t INITIAL_CONTRIBUTION_COUNT = 0;
 
 #endif
