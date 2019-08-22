@@ -19,7 +19,8 @@ const float ELO_N_SCALE = 400.0;
 const float ELO_EXP_BASE = 10.0;
 
 // define strucutre parameters
-const int ELO_STORE_SIZE = 5000;
-const int CONTRIBUTION_STORE_SIZE = 100000;
+const int32_t ELO_STORE_SIZE = 5000;
+const int32_t CONTRIBUTION_STORE_SIZE = 100000;
+const int32_t INITIAL_CONTRIBUTION_COUNT = 0;
 
 #endif
