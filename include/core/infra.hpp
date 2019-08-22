@@ -45,6 +45,7 @@ class ContributionStore {
         ContributionStore(EloStore& elo_store);
         void add_contribution(cid contribution_id);
         void update_contribution(cid contribution_id, elo new_rating);
+        elo fetch_contribution_elo(cid contribution_id);
 
     private:
         EloStore& elo_store;

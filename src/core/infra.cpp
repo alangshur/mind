@@ -57,3 +57,7 @@ void ContributionStore::update_contribution(cid contribution_id, elo new_rating)
     // store new contribution
     (this->store)[contribution_id].store(contribution);
 }
+
+elo ContributionStore::fetch_contribution_elo(cid contribution_id) {
+    return (this->store)[contribution_id].load().rating;
+}
