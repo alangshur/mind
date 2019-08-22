@@ -9,8 +9,8 @@
 typedef struct {
     cid contribution_id;
     elo rating;
-    int32_t count;
-    std::multimap<int32_t, cid>::iterator position;
+    size_t count;
+    std::multimap<size_t, cid>::iterator position;
 } contribution_t;
 
 /*
@@ -23,13 +23,14 @@ typedef struct {
 class EloStore {
     public:
         EloStore();
-        std::multimap<int32_t, cid>::iterator add_contribution(cid contribution_id, 
+        std::multimap<size_t, cid>::iterator add_contribution(cid contribution_id, 
             elo init_rating);
-        std::multimap<int32_t, cid>::iterator update_contribution(cid contribution_id, 
-            std::multimap<int32_t, cid>::iterator position, elo old_rating, elo new_rating);
+        std::multimap<size_t, cid>::iterator update_contribution(cid contribution_id, 
+            std::multimap<size_t, cid>::iterator position, elo old_rating, elo new_rating,
+            size_t count);
     
     private:
-        std::vector<std::atomic<std::multimap<int32_t, cid>>> store;
+        std::vector<std::atomic<std::multimap<size_t, cid>>> store;
 };
 
 /*
