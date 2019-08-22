@@ -32,12 +32,10 @@ void EngineIngestor::run_ingestion() {
         if (result.second == 0) {
             this->new_queue.load()->push(result);
             this->new_queue_sem.post();
-            cout << "New contribution with ID" << result.first << endl << flush;
         }
         else {
             this->update_queue.load()->push(result);
             this->update_queue_sem.post();
-            cout << "Contribution " << result.first << " beat " << result.second << endl << flush;
         }
     }
 
