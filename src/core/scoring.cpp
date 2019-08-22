@@ -1,5 +1,5 @@
 #include <cmath>
-#include "scoring.h"
+#include "core/scoring.hpp"
 using namespace std;
 
 std::pair<elo, elo> EngineScorer::update_scores(elo winner, elo loser) {
@@ -10,12 +10,11 @@ std::pair<elo, elo> EngineScorer::update_scores(elo winner, elo loser) {
 }
 
 elo EngineScorer::calculate_rating(elo target, elo other, bool is_winner) {
-    const float true_outcome = is_winner ? 1 : 0;
 
     // calculate expected outcome
     const float exp = (other - target) / ELO_N_SCALE;
     const float expected_outcome = 1 / (1 + pow(ELO_EXP_BASE, exp));
     
     // calculate new rating
-    return target + ELO_K_FACTOR * (true_outcome - expected_outcome);
+    return target + ELO_K_FACTOR * (is_winner - expected_outcome);
 }

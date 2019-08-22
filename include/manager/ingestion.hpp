@@ -6,8 +6,8 @@
 #include <atomic>
 #include <utility>
 #include <unistd.h>
-#include "orchestrator.h"
-#include "manager/semaphore.h"
+#include "orchestrator.hpp"
+#include "manager/semaphore.hpp"
 
 /*
     The engine ingestor class monitors a piped file descriptor
@@ -30,9 +30,9 @@ class EngineIngestor {
     private:
         std::pair<cid, cid> read_fd_packet();
 
-        std::atomic<bool> shutdown_flag; 
         int input_fd;
         int self_input_fd;
+        EffSemaphore binary_shutdown_sem;
 };
 
 #endif

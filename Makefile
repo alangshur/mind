@@ -1,15 +1,15 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall -O3
-# CXXFLAGS_WARN_OFF += -Wno-unused-private-field
 INCLUDE = -Iinclude
 MODULES = $(shell find src -name *.cpp)
-LIBS = # ...
 NAME = mind-engine
+TEST_MODULES = test-framework.cpp
+TEST_NAME = mind-engine-test
 
 all: $(NAME)
 
 $(NAME): $(MODULES)
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARN_OFF) $(LIBS) $(INCLUDE) $^ -o $@
+	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARN_OFF) $(INCLUDE) $^ -o $@
 
 run:
 	@make all > /dev/null

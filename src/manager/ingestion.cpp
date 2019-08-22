@@ -1,23 +1,30 @@
 #include <stdlib.h>
 #include <chrono>
 #include <iostream>
-#include "orchestrator.h"
-#include "manager/ingestion.h"
+#include "orchestrator.hpp"
+#include "manager/ingestion.hpp"
 using namespace std;
 
 EngineIngestor::EngineIngestor(int read_fd, int write_fd) : 
     new_queue(new queue<pair<cid, cid>>), update_queue(new queue<pair<cid, cid>>), 
     new_queue_sem(EffSemaphore(0)), update_queue_sem(EffSemaphore(0)), 
-    shutdown_flag(false), input_fd(read_fd), self_input_fd(write_fd) {}
+    input_fd(read_fd), self_input_fd(write_fd), binary_shutdown_sem(EffSemaphore(0)) {}
 
 EngineIngestor::~EngineIngestor() { 
+    this->shutdown_ingestor();
+
+    // close file descriptors
     close(this->input_fd); 
     close(this->self_input_fd);
+
+    // free memory
+    delete this->new_queue.load();
+    delete this->update_queue.load();
 }
 
 void EngineIngestor::run_ingestion() {
     pair<cid, cid> result;
-    while (!this->shutdown_flag) {
+    while (true) {
         result = this->read_fd_packet();
         if (result.first == 0) break;
 
@@ -33,11 +40,14 @@ void EngineIngestor::run_ingestion() {
             cout << "Contribution " << result.first << " beat " << result.second << endl << flush;
         }
     }
+
+    // signal shutdown
+    this->binary_shutdown_sem.post();
 }
 
 void EngineIngestor::shutdown_ingestor() {
-    this->shutdown_flag = true;
     write(this->self_input_fd, SHUTDOWN_PACKET, INGEST_PACKET_BYTES);
+    this->binary_shutdown_sem.wait();
 }
 
 pair<cid, cid> EngineIngestor::read_fd_packet() {
