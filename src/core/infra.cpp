@@ -3,56 +3,51 @@
 #include "core/infra.hpp"
 using namespace std;
 
-// EloStore::EloStore() : store(vector<atomic<list<cid>>>(ELO_STORE_SIZE)) {}
+EloStore::EloStore() : store(vector<EloList>(ELO_STORE_SIZE)) {}
 
-// list<cid>::iterator EloStore::add_contribution(cid contribution_id, elo init_rating) {
+c_node* EloStore::add_contribution(cid contribution_id, elo init_rating) {
     
-//     // insert contribution and return position
-//     (this->store)[(int) init_rating]
-//         .load()
-//         .push_back(contribution_id);
-//     return 
-// }
+    // insert contribution and return position
+    return (this->store)[(int) init_rating]
+        .add_contribution(contribution_id);
+}
 
-// list<cid>::iterator EloStore::update_contribution(cid contribution_id, 
-//     list<cid>::iterator position, elo old_rating, elo new_rating) {
+c_node* EloStore::update_contribution(cid contribution_id, c_node* position, 
+    elo old_rating, elo new_rating) {
 
-//     // remove old contribution
-//     (this->store)[(int) round(old_rating)]
-//         .load()
-//         .erase(position);
+    // remove old contribution
+    (this->store)[(int) round(old_rating)]
+        .remove_contribution(position);
 
-//     // update contribution
-//     return (this->store)[(int) round(new_rating)]
-//         .load()
-//         .insert(pair<uint32_t, cid>(count, contribution_id));
-// }
+    // update contribution
+    return (this->store)[(int) round(new_rating)]
+        .add_contribution(contribution_id);
+}
 
-// ContributionStore::ContributionStore(EloStore& elo_store) : elo_store(elo_store),
-//     store(vector<atomic<contribution_t>>(CONTRIBUTION_STORE_SIZE)) {}
+ContributionStore::ContributionStore(EloStore& elo_store) : elo_store(elo_store),
+    store(vector<atomic<contribution_t>>(CONTRIBUTION_STORE_SIZE)) {}
 
-// void ContributionStore::add_contribution(cid contribution_id) {
+void ContributionStore::add_contribution(cid contribution_id) {
 
-//     // build initial contribution
-//     contribution_t contribution;
-//     contribution.contribution_id = contribution_id;
-//     contribution.rating = ELO_INITIAL_RATING;
-//     contribution.count = INITIAL_CONTRIBUTION_COUNT;
-//     contribution.position = this->elo_store.add_contribution(contribution_id, 
-//         ELO_INITIAL_RATING, INITIAL_CONTRIBUTION_COUNT);
+    // build initial contribution
+    contribution_t contribution;
+    contribution.contribution_id = contribution_id;
+    contribution.rating = ELO_INITIAL_RATING;
+    contribution.position = this->elo_store.add_contribution(contribution_id, 
+        ELO_INITIAL_RATING);
 
-//     // store new contribution
-//     (this->store)[contribution_id].store(contribution);
-// }
+    // store new contribution
+    (this->store)[contribution_id].store(contribution);
+}
 
-// void ContributionStore::update_contribution(cid contribution_id, elo new_rating) {
+void ContributionStore::update_contribution(cid contribution_id, elo new_rating) {
 
-//     // update old contribution
-//     contribution_t contribution = (this->store)[contribution_id].load();
-//     contribution.position = this->elo_store.update_contribution(contribution_id, 
-//         contribution.position, contribution.rating, new_rating, contribution.count);
-//     contribution.rating = new_rating;
+    // update old contribution
+    contribution_t contribution = (this->store)[contribution_id].load();
+    contribution.position = this->elo_store.update_contribution(contribution_id, 
+        contribution.position, contribution.rating, new_rating);
+    contribution.rating = new_rating;
 
-//     // store new contribution
-//     (this->store)[contribution_id].store(contribution);
-// }
+    // store new contribution
+    (this->store)[contribution_id].store(contribution);
+}

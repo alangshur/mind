@@ -61,6 +61,8 @@ void EloList::remove_contribution(c_node* node) {
 
 cid EloList::cycle_front_contribution() {
     lock_guard<mutex> lg(this->list_mutex);
+
+    // move head node to tail
     if (this->total_nodes == 0) return 0;
     else if (this->total_nodes == 1) return this->head->id;
     else {

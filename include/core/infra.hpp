@@ -2,14 +2,14 @@
 #define STORE_H
 
 #include <vector>
-#include <list>
 #include <atomic>
+#include "core/elolist.hpp"
 #include "orchestrator.hpp"
 
 typedef struct {
     cid contribution_id;
     elo rating;
-    std::list<cid>::iterator position;
+    c_node* position;
 } contribution_t;
 
 /*
@@ -27,10 +27,10 @@ class EloStore {
         ~EloStore();
 
     private:
-        std::list<cid>::iterator add_contribution(cid contribution_id, elo init_rating);
-        std::list<cid>::iterator update_contribution(cid contribution_id, 
-            std::list<cid>::iterator position, elo old_rating, elo new_rating);
-        std::vector<std::atomic<std::list<cid>>> store;
+        c_node* add_contribution(cid contribution_id, elo init_rating);
+        c_node* update_contribution(cid contribution_id, 
+            c_node* position, elo old_rating, elo new_rating);
+        std::vector<EloList> store;
 };
 
 /*
