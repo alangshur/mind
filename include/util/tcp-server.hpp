@@ -10,14 +10,16 @@ using ip::tcp;
 
 class EngineServer {
     public:
-        EngineServer(uint16_t port);
+        EngineServer(uint16_t server_port);
         tcp::socket accept_connection();
-        std::pair<std::string, std::string> read_message(tcp::socket & socket);
+        tcp::socket send_connection(const std::string& addr, uint16_t port);
+        std::pair<std::string, std::string> read_message(tcp::socket& socket);
         void send_message(tcp::socket& socket, const std::string& protocol,
             const std::string& payload);
 
     private:
-        uint16_t port;
+        uint16_t server_port;
+        boost::asio::io_service io_service;
 };
 
 #endif
