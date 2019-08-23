@@ -4,21 +4,21 @@
 #include "core/infrastructure.hpp"
 using namespace std;
 
-EloStore::EloStore() : store(vector<EloList>(ELO_STORE_SIZE)) {}
+EngineEloStore::EngineEloStore() : store(vector<EloList>(ELO_STORE_SIZE)) {}
 
-EloStore::~EloStore() {
+EngineEloStore::~EngineEloStore() {
     for (size_t i = 0; i < store.size(); i++) {
         (this->store)[i].free_list_memory();
     }
 }
 
-c_node* EloStore::add_contribution(cid contribution_id, elo init_rating) {
+c_node* EngineEloStore::add_contribution(cid contribution_id, elo init_rating) {
     
     // insert contribution and return position
     return (this->store)[(int) init_rating].add_contribution(contribution_id);
 }
 
-c_node* EloStore::update_contribution(cid contribution_id, c_node* position, 
+c_node* EngineEloStore::update_contribution(cid contribution_id, c_node* position, 
     elo old_rating, elo new_rating) {
 
     // remove old contribution
@@ -30,10 +30,10 @@ c_node* EloStore::update_contribution(cid contribution_id, c_node* position,
         .add_contribution(contribution_id);
 }
 
-ContributionStore::ContributionStore(EloStore& elo_store) : elo_store(elo_store),
+EngineContributionStore::EngineContributionStore(EngineEloStore& elo_store) : elo_store(elo_store),
     store(vector<atomic<contribution_t>>(CONTRIBUTION_STORE_SIZE)) {}
 
-void ContributionStore::add_contribution(cid contribution_id) {
+void EngineContributionStore::add_contribution(cid contribution_id) {
 
     // build initial contribution
     contribution_t contribution;
@@ -46,7 +46,7 @@ void ContributionStore::add_contribution(cid contribution_id) {
     (this->store)[contribution_id].store(contribution);
 }
 
-void ContributionStore::update_contribution(cid contribution_id, elo new_rating) {
+void EngineContributionStore::update_contribution(cid contribution_id, elo new_rating) {
 
     // update old contribution
     contribution_t contribution = (this->store)[contribution_id].load();
@@ -58,6 +58,6 @@ void ContributionStore::update_contribution(cid contribution_id, elo new_rating)
     (this->store)[contribution_id].store(contribution);
 }
 
-elo ContributionStore::fetch_contribution_elo(cid contribution_id) {
+elo EngineContributionStore::fetch_contribution_elo(cid contribution_id) {
     return (this->store)[contribution_id].load().rating;
 }

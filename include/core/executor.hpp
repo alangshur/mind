@@ -17,15 +17,15 @@
 */
 class EngineExecutor {
     public:
-        EngineExecutor(EngineIngestor& ingestor, EloStore& elo_store, 
-            ContributionStore& contribution_store);
+        EngineExecutor(EngineIngestor& ingestor, EngineEloStore& elo_store, 
+            EngineContributionStore& contribution_store);
         void run_contribution_pipeline();
         void run_update_pipeline();
         void shutdown_pipelines();
 
     private:
         EngineIngestor& ingestor;
-        ContributionStore& contribution_store;
+        EngineContributionStore& contribution_store;
         EffSemaphore ternary_shutdown_sem;
         std::atomic<bool> shutdown_flag;
 };

@@ -10,15 +10,6 @@
 #include "core/executor.hpp"
 using namespace std;
 
-// // start clock 
-// using nano = std::chrono::nanoseconds;
-// auto start = std::chrono::high_resolution_clock::now();
-// // stop clock
-// auto finish = std::chrono::high_resolution_clock::now();
-// std::cout << "Parent run-time: " 
-//     << std::chrono::duration_cast<nano>(finish - start).count()
-//     << std::endl << std::flush; 
-
 void ingestor_fn(EngineIngestor* ingestor) { 
     ingestor->run_ingestion(); 
 }
@@ -40,8 +31,8 @@ int main(int argc, const char* argv[]) {
 
     // run child process
     if (pid == 0) {
-        EloStore* elo_store = new EloStore();
-        ContributionStore* contribution_store = new ContributionStore(*elo_store);
+        EngineEloStore* elo_store = new EngineEloStore();
+        EngineContributionStore* contribution_store = new EngineContributionStore(*elo_store);
         EngineIngestor* ingestor = new EngineIngestor(fd[0], fd[1]);
         EngineExecutor* executor = new EngineExecutor(*ingestor, *elo_store, *contribution_store);
         thread t1(ingestor_fn, ingestor);
