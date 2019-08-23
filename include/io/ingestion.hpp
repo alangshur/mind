@@ -7,7 +7,7 @@
 #include <utility>
 #include <unistd.h>
 #include "orchestrator.hpp"
-#include "manager/semaphore.hpp"
+#include "util/semaphore.hpp"
 
 /*
     The engine ingestor class monitors a piped file descriptor
@@ -22,7 +22,7 @@ class EngineIngestor {
         void run_ingestion();
         void shutdown_ingestor();
 
-        std::atomic<std::queue<std::pair<cid, cid>>*> new_queue;
+        std::atomic<std::queue<cid>*> new_queue;
         std::atomic<std::queue<std::pair<cid, cid>>*> update_queue;
         EffSemaphore new_queue_sem;
         EffSemaphore update_queue_sem;

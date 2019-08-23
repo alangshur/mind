@@ -1,9 +1,9 @@
-#ifndef STORE_H
-#define STORE_H
+#ifndef INFRASTRUCTURE_H
+#define INFRASTRUCTURE_H
 
 #include <vector>
 #include <atomic>
-#include "core/elolist.hpp"
+#include "util/rating-list.hpp"
 #include "orchestrator.hpp"
 
 typedef struct {
@@ -19,12 +19,12 @@ typedef struct {
     allows for the ratings of all the platform contributions 
     to be tediously tracked and organized.
 */
-class EloStore {
-    friend class ContributionStore;
+class EngineEloStore {
+    friend class EngineContributionStore;
 
     public:
-        EloStore();
-        ~EloStore();
+        EngineEloStore();
+        ~EngineEloStore();
 
     private:
         c_node* add_contribution(cid contribution_id, elo init_rating);
@@ -40,15 +40,15 @@ class EloStore {
     the store above to allow for individual contributions to be
     manually indexed. 
 */
-class ContributionStore {
+class EngineContributionStore {
     public:
-        ContributionStore(EloStore& elo_store);
-        ~ContributionStore();
+        EngineContributionStore(EngineEloStore& elo_store);
         void add_contribution(cid contribution_id);
         void update_contribution(cid contribution_id, elo new_rating);
+        elo fetch_contribution_elo(cid contribution_id);
 
     private:
-        EloStore& elo_store;
+        EngineEloStore& elo_store;
         std::vector<std::atomic<contribution_t>> store;
 };
 

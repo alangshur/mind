@@ -1,4 +1,5 @@
-#include "core/elolist.hpp"
+#include <iostream>
+#include "util/rating-list.hpp"
 using namespace std;
 
 EloList::EloList() : head(nullptr), tail(nullptr), list_mutex(mutex()), 
@@ -56,7 +57,7 @@ void EloList::remove_contribution(c_node* node) {
 
     // decrement counter
     delete node;
-    this->total_nodes++;
+    this->total_nodes--;
 }
 
 cid EloList::cycle_front_contribution() {
@@ -73,5 +74,16 @@ cid EloList::cycle_front_contribution() {
         this->tail->prev = cycle;
         this->tail = cycle;
         return cycle->id;
+    }
+}
+
+void EloList::free_list_memory() {
+    if (this->total_nodes == 0) return;
+    lock_guard<mutex> lg(this->list_mutex);
+    
+    // iteratively remove nodes
+    while (this->total_nodes > 0) {
+        c_node* curr_node = this->head;
+        this->remove_contribution(curr_node);
     }
 }

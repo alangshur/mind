@@ -1,5 +1,6 @@
 CXX = g++
-CXXFLAGS = -std=c++17 -Wall -O3
+CXXFLAGS = -std=c++17 -Wall
+OPTIMIZATION = -O3
 INCLUDE = -Iinclude
 MODULES = $(shell find src -name *.cpp)
 NAME = mind-engine
@@ -9,7 +10,7 @@ TEST_NAME = mind-engine-test
 all: $(NAME)
 
 $(NAME): $(MODULES)
-	$(CXX) $(CXXFLAGS) $(CXXFLAGS_WARN_OFF) $(INCLUDE) $^ -o $@
+	$(CXX) $(CXXFLAGS) $(OPTIMIZATION) $(CXXFLAGS_WARN_OFF) $(INCLUDE) $^ -o $@
 
 run:
 	@make all > /dev/null

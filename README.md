@@ -1,16 +1,21 @@
 # mind-engine
 
-## Engine Role
+## Dependencies
 
-The engine application will carry out the following tasks:  
+The following dependencies are required for compiling and developing
+this project:
 
-- Register the addition of new contributions to the platform  
-- Register changes to already existing contributions in the platform  
-- Store the ELO ratings of all contributions to the platform in memory  
-- Actively persist ELO rankings to external database storage
-- Monitor distirbution of ELO scores and signal end of engine round  
+- GNU g++ compiler: `$ brew install gcc`
+- GNU make: `$ brew install make`
+- Boost libraries: `$ brew install boost`  
 
-## Useful Commands
+## Building
+
+To compile the project (within project directory): `$ make`  
+
+To run and compile the project: `$ make run`
+
+## Pinned Commands
 
 Kill all mind-engine processes:
 
