@@ -1,5 +1,5 @@
 #include <iostream>
-#include "core/elolist.hpp"
+#include "util/rating-list.hpp"
 using namespace std;
 
 EloList::EloList() : head(nullptr), tail(nullptr), list_mutex(mutex()), 

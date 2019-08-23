@@ -5,8 +5,8 @@
 #include <ctime>
 #include <thread>
 #include "orchestrator.hpp"
-#include "manager/ingestion.hpp"
-#include "core/infra.hpp"
+#include "io/ingestion.hpp"
+#include "core/infrastructure.hpp"
 #include "core/executor.hpp"
 using namespace std;
 

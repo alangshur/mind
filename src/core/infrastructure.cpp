@@ -1,7 +1,7 @@
 #include <utility>
 #include <iostream>
 #include "math.h"
-#include "core/infra.hpp"
+#include "core/infrastructure.hpp"
 using namespace std;
 
 EloStore::EloStore() : store(vector<EloList>(ELO_STORE_SIZE)) {}

@@ -1,5 +1,5 @@
-#ifndef SCORING_H
-#define SCORING_H
+#ifndef ELO_SCORING_H
+#define ELO_SCORING_H
 
 #include <utility>
 #include "orchestrator.hpp"

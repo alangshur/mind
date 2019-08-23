@@ -1,5 +1,5 @@
 #include <cassert>
-#include "manager/semaphore.hpp"
+#include "util/semaphore.hpp"
 
 BaseSemaphore::BaseSemaphore(int count) : m_count(count) { 
     assert(count > -1); 

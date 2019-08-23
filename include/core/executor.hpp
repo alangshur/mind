@@ -3,10 +3,10 @@
 
 #include <atomic>
 #include "orchestrator.hpp"
-#include "manager/ingestion.hpp"
-#include "manager/semaphore.hpp"
-#include "core/scoring.hpp"
-#include "core/infra.hpp"
+#include "io/ingestion.hpp"
+#include "util/semaphore.hpp"
+#include "core/elo-scoring.hpp"
+#include "core/infrastructure.hpp"
 
 /*
     The engine executor class pieces together the entire 

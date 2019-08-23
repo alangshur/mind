@@ -1,9 +1,9 @@
-#ifndef STORE_H
-#define STORE_H
+#ifndef INFRASTRUCTURE_H
+#define INFRASTRUCTURE_H
 
 #include <vector>
 #include <atomic>
-#include "core/elolist.hpp"
+#include "util/rating-list.hpp"
 #include "orchestrator.hpp"
 
 typedef struct {

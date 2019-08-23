@@ -1,5 +1,5 @@
 #include <cmath>
-#include "core/scoring.hpp"
+#include "core/elo-scoring.hpp"
 using namespace std;
 
 std::pair<elo, elo> EngineScorer::update_scores(elo winner, elo loser) {
