@@ -4,7 +4,7 @@
 #include "core/infrastructure.hpp"
 using namespace std;
 
-EngineEloStore::EngineEloStore() : store(vector<EloList>(ELO_STORE_SIZE)) {}
+EngineEloStore::EngineEloStore() : store(ELO_STORE_SIZE) {}
 
 EngineEloStore::~EngineEloStore() {
     for (size_t i = 0; i < store.size(); i++) {
@@ -30,8 +30,8 @@ c_node* EngineEloStore::update_contribution(cid contribution_id, c_node* positio
         .add_contribution(contribution_id);
 }
 
-EngineContributionStore::EngineContributionStore(EngineEloStore& elo_store) : elo_store(elo_store),
-    store(vector<atomic<contribution_t>>(CONTRIBUTION_STORE_SIZE)) {}
+EngineContributionStore::EngineContributionStore(EngineEloStore& elo_store) : 
+    elo_store(elo_store), store(CONTRIBUTION_STORE_SIZE) {}
 
 void EngineContributionStore::add_contribution(cid contribution_id) {
 

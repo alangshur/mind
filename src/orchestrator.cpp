@@ -4,10 +4,12 @@
 #include <chrono>
 #include <ctime>
 #include <thread>
+#include <boost/asio.hpp>
 #include "orchestrator.hpp"
 #include "io/ingestion.hpp"
 #include "core/infrastructure.hpp"
 #include "core/executor.hpp"
+#include "util/tcp-server.hpp"
 using namespace std;
 
 // void ingestor_fn(EngineIngestor* ingestor) { 
@@ -60,5 +62,23 @@ using namespace std;
 // }
 
 int main(int argc, const char* argv[]) {
-    
+    // try {
+    //     boost::asio::io_context io_context;
+    //     TCPServer server(io_context);
+    //     io_context.run();
+    // }
+    // catch (std::exception& e) {
+    //     std::cerr << e.what() << std::endl;
+    // }
+
+    try {
+        boost::asio::io_context io_context;
+        TCPServer server(io_context, 5000);
+        server.run();
+    } 
+    catch (std::exception & e) {
+        std::cerr << "Exception: " << e.what() << "\n";
+    }
+
+    return 0;
 }

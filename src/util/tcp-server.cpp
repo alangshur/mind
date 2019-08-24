@@ -1,37 +1,32 @@
 #include "util/tcp-server.hpp"
+using boost::asio::ip::tcp;
 
-using namespace boost::asio;
-using ip::tcp;
-
-EngineServer::EngineServer(uint16_t port) : server_port(server_port),
-    io_service(boost::asio::io_service()) {}
-
-tcp::socket EngineServer::accept_connection() {
-    tcp::acceptor acceptor(this->io_service, tcp::endpoint(tcp::v4(), 
-        this->server_port));
-    tcp::socket socket(this->io_service);
-    acceptor.accept(socket);
-    return socket;
+void TPCConnection::do_read() {
+    auto self(shared_from_this());
+    socket_.async_read_some(boost::asio::buffer(data_, max_length),
+    [this, self](std::error_code ec, std::size_t length) {
+        if (!ec) { do_write(length); }
+    });
 }
 
-tcp::socket EngineServer::send_connection(const std::string& addr, uint16_t port) {
-    tcp::socket socket(this->io_service);
-    socket.connect(tcp::endpoint(boost::asio::ip::address::from_string(addr), port));
-    return socket;
+void TPCConnection::do_write(std::size_t length) {
+    auto self(shared_from_this());
+    boost::asio::async_write(socket_, boost::asio::buffer(data_, length),
+    [this, self](std::error_code ec, std::size_t) {
+        if (!ec) { do_read(); }
+    });
 }
 
-std::pair<std::string, std::string> EngineServer::read_message(tcp::socket& socket) {
-    boost::asio::streambuf protocol_buf, payload_buf;
-    boost::asio::read_until(socket, protocol_buf, "\n");
-    boost::asio::read_until(socket, payload_buf, "\n");
-    return std::pair<std::string, std::string>(
-        boost::asio::buffer_cast<const char*>(protocol_buf.data()),
-        boost::asio::buffer_cast<const char*>(payload_buf.data())
+TCPServer::TCPServer(boost::asio::io_context& io_context, uint16_t port)
+    : acceptor_(io_context, tcp::endpoint(tcp::v4(), port)), 
+    socket_(io_context), io_context(io_context) { do_accept(); }
+
+void TCPServer::do_accept() {
+    acceptor_.async_accept(
+        socket_,
+        [this](std::error_code ec) {
+            if (!ec) { std::make_shared<TPCConnection>(std::move(socket_))->start(); }
+            do_accept();
+        }
     );
-}
-
-void send_message(tcp::socket& socket, const std::string& protocol, 
-    const std::string& payload) {
-    const std::string msg = protocol + "\n" + payload + "\n";
-    boost::asio::write(socket, boost::asio::buffer(msg));
 }

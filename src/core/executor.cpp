@@ -5,7 +5,7 @@ using namespace std;
 
 EngineExecutor::EngineExecutor(EngineIngestor& ingestor, EngineEloStore& elo_store, 
     EngineContributionStore& contribution_store) : ingestor(ingestor), 
-    contribution_store(contribution_store), ternary_shutdown_sem(EffSemaphore(0)), 
+    contribution_store(contribution_store), ternary_shutdown_sem(0), 
     shutdown_flag(false) {}
 
 void EngineExecutor::run_contribution_pipeline() {
