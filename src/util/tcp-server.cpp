@@ -37,6 +37,34 @@ packet_t TCPServer::read_packet() {
     }
 }
 
+packet_t TCPServer::build_packet(const std::string& protocol_str, 
+    const std::string& payload_str) {
+    try {
+        assert(protocol_str.size() <= PROTOCOL_BYTES);
+        assert(payload_str.size() <= PAYLOAD_BYTES);
+        return {
+            protocol_str + std::string(PROTOCOL_BYTES - protocol_str.size(), '-'), 
+            payload_str + std::string(PAYLOAD_BYTES - payload_str.size(), '-')
+        };
+    }
+    catch (std::exception& e) {
+        this->error_flag = true;
+        return {};
+    }
+}
+
+void TCPServer::write_packet(const packet_t& packet) {
+    try {
+        boost::asio::write(
+            *(this->socket_ptr), 
+            boost::asio::buffer(packet.protocol + packet.payload)
+        );
+    }
+    catch (std::exception& e) {
+        this->error_flag = true;
+    }
+} 
+
 void TCPServer::close_connection() {
     try {
         (*(this->socket_ptr)).close();

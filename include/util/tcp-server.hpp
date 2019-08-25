@@ -22,6 +22,9 @@ class TCPServer {
         TCPServer(uint16_t server_port);
         void accept_connection();
         packet_t read_packet();
+        packet_t build_packet(const std::string& protocol_str, 
+            const std::string& payload_str);
+        void write_packet(const packet_t& packet);
         void close_connection();
 
     private:

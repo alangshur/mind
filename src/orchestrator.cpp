@@ -68,6 +68,7 @@ int main(int argc, const char* argv[]) {
     cout << "Packet received at " << time(0) << ":" << endl;
     cout << "\tProtocol: " << packet.protocol << endl;
     cout << "\tPayload: " << packet.payload << endl << flush;
+    server.write_packet(server.build_packet(packet.protocol, packet.payload));
     server.close_connection();
     return 0;
 }
