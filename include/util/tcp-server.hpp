@@ -19,27 +19,44 @@ typedef struct {
 
 /*
     The TCP server class is a synchronous TCP framework for
-    sending/receiving TCP connections and sending/receiving 
-    packet communications over these connections.
+    sending/receiving server TCP connections and sending/receiving 
+    server packet communications over these connections.
 */
 class TCPServer {
     public:
         TCPServer(uint16_t server_port);
         void accept_connection();
         packet_t read_packet();
-        packet_t build_packet(const std::string& protocol_str, 
-            const std::string& payload_str);
         void write_packet(const packet_t& packet);
         void close_connection();
+        static packet_t build_packet(const std::string& protocol_str, 
+            const std::string& payload_str);
 
     private:
         boost::asio::io_context io_context;
         tcp::acceptor acceptor;
         std::shared_ptr<tcp::socket> socket_ptr;
-        bool error_flag;
         bool active_connection;
 };
 
-class TCPClient {};
+/*
+    The TCP client class is a synchronous TCP framework for
+    sending/receiving client TCP connections and sending/receiving 
+    client packet communications over these connections.
+*/
+class TCPClient {
+    public:
+        TCPClient();
+        void send_connection(const std::string& addr, uint16_t port);
+        packet_t read_packet();
+        void write_packet(const packet_t& packet);
+        void close_connection();
+
+    private:
+        boost::asio::io_context io_context;
+        tcp::resolver resolver;
+        std::shared_ptr<tcp::socket> socket_ptr;
+        bool active_connection;
+};
 
 #endif

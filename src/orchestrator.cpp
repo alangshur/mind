@@ -63,13 +63,19 @@ using namespace std;
 // }
 
 int main(int argc, const char* argv[]) {
-    TCPServer server(5000);
-    server.accept_connection();
-    packet_t packet = server.read_packet();
-    cout << "Packet received at " << time(0) << ":" << endl;
-    cout << "\tProtocol: " << packet.protocol << endl;
-    cout << "\tPayload: " << packet.payload << endl << flush;
-    server.write_packet(server.build_packet(packet.protocol, packet.payload));
-    server.close_connection();
+
+    // TCPServer server(5000);
+    // server.accept_connection();
+    // packet_t packet = server.read_packet();
+    // cout << "Packet received at " << time(0) << ":" << endl;
+    // cout << "\tProtocol: " << packet.protocol << endl;
+    // cout << "\tPayload: " << packet.payload << endl << flush;
+    // // server.write_packet({packet.protocol, packet.payload});
+    // server.close_connection();
+
+    TCPClient client;
+    client.send_connection("127.0.0.1", 5000);
+    client.write_packet({"YA", "Hello, world!!"});
+    client.close_connection();
     return 0;
 }
