@@ -8,7 +8,9 @@ typedef uint32_t cid;
 typedef float elo;
 
 // define network parameters
-const uint32_t PAYLOAD_BYTES = 32;
+const uint32_t PROTOCOL_BYTES = 2;
+const uint32_t PAYLOAD_BYTES = 14;
+const uint32_t PACKET_BYTES = PROTOCOL_BYTES + PAYLOAD_BYTES;
 
 // define manager paramaters
 const uint32_t INGEST_PACKET_BYTES = 14;

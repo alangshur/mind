@@ -62,7 +62,12 @@ using namespace std;
 // }
 
 int main(int argc, const char* argv[]) {
-    
-
+    TCPServer server(5000);
+    server.accept_connection();
+    packet_t packet = server.read_packet();
+    cout << "Packet received at " << time(0) << ":" << endl;
+    cout << "\tProtocol: " << packet.protocol << endl;
+    cout << "\tPayload: " << packet.payload << endl << flush;
+    server.close_connection();
     return 0;
 }

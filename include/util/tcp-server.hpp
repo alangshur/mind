@@ -1,29 +1,37 @@
 #ifndef TCPTCPServer_H
 #define TCPTCPServer_H
 
+#include <ctime>
+#include <iostream>
 #include <string>
+#include <memory>
+#include <boost/asio.hpp>
 #include "orchestrator.hpp"
+using boost::asio::ip::tcp;
 
-enum Protocol {
-    MATCH = 1, 
-    CHECK = 2,
-    INIT = 3
-};
+typedef std::string protocol_t;
+typedef std::string payload_t;
 
-typedef char Payload[PAYLOAD_BYTES];
 typedef struct {
-    Protocol protocol;
-    Payload payload;
-} Packet;
+    protocol_t protocol;
+    payload_t payload;
+} packet_t;
 
 class TCPServer {
     public:
         TCPServer(uint16_t server_port);
-        void run_tcp_server();
+        void accept_connection();
+        packet_t read_packet();
+        void close_connection();
 
     private:
-        std::string exec_read();
-        void exec_write(std::string message);
+        boost::asio::io_context io_context;
+        tcp::acceptor acceptor;
+        std::shared_ptr<tcp::socket> socket_ptr;
+        bool error_flag;
+        bool active_connection;
 };
+
+class TCPClient {};
 
 #endif
