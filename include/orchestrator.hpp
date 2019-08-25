@@ -8,8 +8,7 @@ typedef uint32_t cid;
 typedef float elo;
 
 // define network parameters
-const uint32_t MAX_PACKET_SIZE = 40960;
-const uint32_t MAX_CLIENT = 1000;
+const uint32_t PAYLOAD_BYTES = 32;
 
 // define manager paramaters
 const uint32_t INGEST_PACKET_BYTES = 14;

@@ -62,23 +62,7 @@ using namespace std;
 // }
 
 int main(int argc, const char* argv[]) {
-    // try {
-    //     boost::asio::io_context io_context;
-    //     TCPServer server(io_context);
-    //     io_context.run();
-    // }
-    // catch (std::exception& e) {
-    //     std::cerr << e.what() << std::endl;
-    // }
-
-    try {
-        boost::asio::io_context io_context;
-        TCPServer server(io_context, 5000);
-        server.run();
-    } 
-    catch (std::exception & e) {
-        std::cerr << "Exception: " << e.what() << "\n";
-    }
+    
 
     return 0;
 }
