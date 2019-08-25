@@ -6,6 +6,7 @@
 #include <thread>
 #include <boost/asio.hpp>
 #include "orchestrator.hpp"
+#include "util/logger.hpp"
 #include "io/ingestion.hpp"
 #include "core/infrastructure.hpp"
 #include "core/executor.hpp"

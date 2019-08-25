@@ -4,9 +4,9 @@
 using namespace std;
 
 EngineExecutor::EngineExecutor(EngineIngestor& ingestor, EngineEloStore& elo_store, 
-    EngineContributionStore& contribution_store) : ingestor(ingestor), 
+    EngineContributionStore& contribution_store, Logger& logger) : ingestor(ingestor), 
     contribution_store(contribution_store), ternary_shutdown_sem(0), 
-    shutdown_flag(false) {}
+    shutdown_flag(false), logger(logger) {}
 
 void EngineExecutor::run_contribution_pipeline() {
     cid contribution_id;
@@ -16,7 +16,10 @@ void EngineExecutor::run_contribution_pipeline() {
         this->ingestor.new_queue_sem.wait();
         if (this->shutdown_flag) break;
         contribution_id = this->ingestor.new_queue.load()->front();
-        this->contribution_store.add_contribution(contribution_id);
+        try { this->contribution_store.add_contribution(contribution_id); }
+        catch (exception& e) { this->logger.log_error("EngineExecutor", e.what()); }
+        this->logger.log_message("EngineExecutor", "Successfully added contribution with ID " 
+            + to_string(contribution_id) + ".");
         this->ingestor.new_queue.load()->pop();
     }
 
@@ -48,6 +51,8 @@ void EngineExecutor::run_update_pipeline() {
             contribution_elos.first);
         this->contribution_store.update_contribution(contribution_ids.second, 
             contribution_elos.second);
+        // this->logger.log_message("EngineExecutor", "Successfully added contribution with ID " 
+        //     + to_string(contribution_id) + ".");
     }
 
     // signal shutdown

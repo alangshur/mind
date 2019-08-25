@@ -34,6 +34,10 @@ EngineContributionStore::EngineContributionStore(EngineEloStore& elo_store) :
     elo_store(elo_store), store(CONTRIBUTION_STORE_SIZE) {}
 
 void EngineContributionStore::add_contribution(cid contribution_id) {
+    if ((this->store)[contribution_id].load().contribution_id > 0) {
+        throw runtime_error("Addition failed since contribution with ID " 
+            + to_string(contribution_id) + " already exists (cannot be added).");
+    }
 
     // build initial contribution
     contribution_t contribution;
@@ -47,6 +51,10 @@ void EngineContributionStore::add_contribution(cid contribution_id) {
 }
 
 void EngineContributionStore::update_contribution(cid contribution_id, elo new_rating) {
+    if ((this->store)[contribution_id].load().contribution_id == 0) {
+        throw runtime_error("Updated failed since contribution with ID " 
+            + to_string(contribution_id) + " doesn't exist.");
+    }
 
     // update old contribution
     contribution_t contribution = (this->store)[contribution_id].load();

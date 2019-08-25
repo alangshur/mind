@@ -7,6 +7,7 @@
 #include "util/semaphore.hpp"
 #include "core/elo-scoring.hpp"
 #include "core/infrastructure.hpp"
+#include "util/logger.hpp"
 
 /*
     The engine executor class pieces together the entire 
@@ -18,7 +19,7 @@
 class EngineExecutor {
     public:
         EngineExecutor(EngineIngestor& ingestor, EngineEloStore& elo_store, 
-            EngineContributionStore& contribution_store);
+            EngineContributionStore& contribution_store, Logger& logger);
         void run_contribution_pipeline();
         void run_update_pipeline();
         void shutdown_pipelines();
@@ -28,6 +29,7 @@ class EngineExecutor {
         EngineContributionStore& contribution_store;
         EffSemaphore ternary_shutdown_sem;
         std::atomic<bool> shutdown_flag;
+        Logger& logger;
 };
 
 #endif

@@ -7,9 +7,9 @@
 #include "orchestrator.hpp"
 
 typedef struct {
-    cid contribution_id;
-    elo rating;
-    c_node* position;
+    cid contribution_id = 0;
+    elo rating = 0;
+    c_node* position = nullptr;
 } contribution_t;
 
 /*

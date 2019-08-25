@@ -17,6 +17,11 @@ typedef struct {
     payload_t payload;
 } packet_t;
 
+/*
+    The TCP server class is a synchronous TCP framework for
+    sending/receiving TCP connections and sending/receiving 
+    packet communications over these connections.
+*/
 class TCPServer {
     public:
         TCPServer(uint16_t server_port);
