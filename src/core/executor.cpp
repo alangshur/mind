@@ -10,17 +10,24 @@ EngineExecutor::EngineExecutor(EngineIngestor& ingestor, EngineEloStore& elo_sto
 
 void EngineExecutor::run_contribution_pipeline() {
     cid contribution_id;
-    while (true) {
+    try {
+        while (true) {
 
-        // fetch and add new contribution
-        this->ingestor.new_queue_sem.wait();
-        if (this->shutdown_flag) break;
-        contribution_id = this->ingestor.new_queue.load()->front();
-        try { this->contribution_store.add_contribution(contribution_id); }
-        catch (exception& e) { this->logger.log_error("EngineExecutor", e.what()); }
-        this->logger.log_message("EngineExecutor", "Successfully added contribution with ID " 
-            + to_string(contribution_id) + ".");
-        this->ingestor.new_queue.load()->pop();
+            // fetch and add new contribution
+            this->ingestor.new_queue_sem.wait();
+            if (this->shutdown_flag) break;
+            contribution_id = this->ingestor.new_queue.load()->front();
+            try { this->contribution_store.add_contribution(contribution_id); }
+            catch (exception& e) { this->logger.log_error("EngineExecutor", e.what()); }
+            this->logger.log_message("EngineExecutor", "Successfully added contribution with ID " 
+                + to_string(contribution_id) + ".");
+            this->ingestor.new_queue.load()->pop();
+        }
+    }
+    catch(exception& e) {
+        this->logger.log_error("EngineExecutor", "Fatal error in new contribution " 
+            "pipeline: " + string(e.what()));
+        EngineOrchestrator::signal_node_shutdown(this->logger);
     }
 
     // signal shutdown
@@ -32,27 +39,35 @@ void EngineExecutor::run_update_pipeline() {
     pair<elo, elo> contribution_elos;
 
     // run pipeline
-    while (true) {
+    try {
+        while (true) {
 
-        // fetch new update
-        this->ingestor.update_queue_sem.wait();
-        if (this->shutdown_flag) break;
-        contribution_ids = this->ingestor.update_queue.load()->front();
-        this->ingestor.update_queue.load()->pop();
+            // fetch new update
+            this->ingestor.update_queue_sem.wait();
+            if (this->shutdown_flag) break;
+            contribution_ids = this->ingestor.update_queue.load()->front();
+            this->ingestor.update_queue.load()->pop();
 
-        // calculate ELO scores
-        contribution_elos = EngineScorer::update_scores(
-            this->contribution_store.fetch_contribution_elo(contribution_ids.first),
-            this->contribution_store.fetch_contribution_elo(contribution_ids.second)
-        );
+            // calculate ELO scores
+            contribution_elos = EngineScorer::update_scores(
+                this->contribution_store.fetch_contribution_elo(contribution_ids.first),
+                this->contribution_store.fetch_contribution_elo(contribution_ids.second)
+            );
 
-        // update contributions
-        this->contribution_store.update_contribution(contribution_ids.first, 
-            contribution_elos.first);
-        this->contribution_store.update_contribution(contribution_ids.second, 
-            contribution_elos.second);
-        // this->logger.log_message("EngineExecutor", "Successfully added contribution with ID " 
-        //     + to_string(contribution_id) + ".");
+            // update contributions
+            this->contribution_store.update_contribution(contribution_ids.first, 
+                contribution_elos.first);
+            this->contribution_store.update_contribution(contribution_ids.second, 
+                contribution_elos.second);
+            // this->logger.log_message("EngineExecutor", "Successfully added contribution with ID " 
+            //     + to_string(contribution_id) + ".");
+
+        }
+    }
+    catch(exception& e) {
+        this->logger.log_error("EngineExecutor", "Fatal error in contribution update " 
+            "pipeline: " + string(e.what()));
+        EngineOrchestrator::signal_node_shutdown(this->logger);
     }
 
     // signal shutdown
