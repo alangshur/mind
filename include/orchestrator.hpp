@@ -37,13 +37,35 @@ const uint32_t ELO_STORE_SIZE = 5000;
 const uint32_t CONTRIBUTION_STORE_SIZE = 10000;
 const uint32_t INITIAL_CONTRIBUTION_COUNT = 0;
 
-static std::mutex shutdown_lock;
+class EngineShutdownOperator {
+    public:
+        EngineShutdownOperator(Logger& logger) : logger(logger) {}
+        void signal_node_shutdown() {
+            std::lock_guard<std::mutex> lg(shutdown_lock);
+            this->logger.log_error("EngineOrchestrator", "Terminating node.");
+            this->shutdown_node();
+        };
+
+    private:
+        void shutdown_node() { /* TODO: Implement shutdown procedure */ }
+        
+        std::mutex shutdown_lock;
+        Logger& logger;
+};
+
 class EngineOrchestrator {
     public:
-        static void signal_node_shutdown(Logger& logger) {
-            std::lock_guard<std::mutex> lg(shutdown_lock);
-            logger.log_error("EngineOrchestrator", "Terminating node.");
-        };
+        EngineOrchestrator(uint8_t node_num) : 
+            node_num(node_num),
+            logger(node_num), 
+            shutdown_operator(this->logger) {}
+
+    private:
+        void shutdown_node();
+
+        uint8_t node_num;
+        Logger logger;
+        EngineShutdownOperator shutdown_operator;
 };
 
 #endif

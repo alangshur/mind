@@ -27,7 +27,6 @@ void EngineExecutor::run_contribution_pipeline() {
     catch(exception& e) {
         this->logger.log_error("EngineExecutor", "Fatal error in new contribution " 
             "pipeline: " + string(e.what()));
-        EngineOrchestrator::signal_node_shutdown(this->logger);
     }
 
     // signal shutdown
@@ -67,7 +66,6 @@ void EngineExecutor::run_update_pipeline() {
     catch(exception& e) {
         this->logger.log_error("EngineExecutor", "Fatal error in contribution update " 
             "pipeline: " + string(e.what()));
-        EngineOrchestrator::signal_node_shutdown(this->logger);
     }
 
     // signal shutdown

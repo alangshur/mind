@@ -13,15 +13,20 @@
     portal-in variant portal that controls the 
     node's UPDATE protocol processses.
 */
-class EngineUpdatePortal : private EnginePortalIn {
+class EngineIngestionPortal : private EnginePortalIn {
     public:
-        EngineUpdatePortal(uint16_t port, Logger& logger);
-        ~EngineUpdatePortal();
+        EngineIngestionPortal(uint16_t port, Logger& logger,
+            EngineShutdownOperator& shutdown_operator);
+        ~EngineIngestionPortal();
         void run_portal(); 
+        void shutdown_portal();
+
+        std::atomic<std::queue<cid>*> new_queue;
+        std::atomic<std::queue<std::pair<cid, cid>>*> update_queue;
+        EffSemaphore new_queue_sem;
+        EffSemaphore update_queue_sem;
 
     private:
-        std::atomic<std::queue<std::pair<cid, cid>>*> update_queue;
-        EffSemaphore update_queue_sem;
         EffSemaphore binary_shutdown_sem;
 };
 

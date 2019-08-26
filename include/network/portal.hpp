@@ -14,8 +14,11 @@ class EnginePortal {
         virtual void run_portal() = 0;
 
     protected:
-        EnginePortal(Logger& logger) : logger(logger) {}
+        EnginePortal(Logger& logger, EngineShutdownOperator& shutdown_operator)
+            : logger(logger), shutdown_operator(shutdown_operator) {}
+            
         Logger& logger;
+        EngineShutdownOperator& shutdown_operator;
 };
 
 /*
@@ -26,8 +29,9 @@ class EnginePortal {
 */
 class EnginePortalIn : protected EnginePortal {            
     protected:
-        EnginePortalIn(uint16_t port, Logger& logger) : EnginePortal(logger),
-            server(port) {}
+        EnginePortalIn(uint16_t port, Logger& logger, 
+            EngineShutdownOperator& shutdown_operator) 
+            : EnginePortal(logger, shutdown_operator), server(port){}
         virtual void run_portal() = 0;
         void send_ack_packet(std::string protocol) 
             { this->server.write_packet({protocol, ACK_PAYLOAD}); };
@@ -45,7 +49,8 @@ class EnginePortalIn : protected EnginePortal {
 */
 class EnginePortalOut : protected EnginePortal {
     protected:
-        EnginePortalOut(Logger& logger) : EnginePortal(logger) {}
+        EnginePortalOut(Logger& logger, EngineShutdownOperator& shutdown_operator)
+            : EnginePortal(logger, shutdown_operator) {}
         virtual void run_portal() = 0;
         void send_ack_packet(std::string protocol) 
             { this->client.write_packet({protocol, ACK_PAYLOAD}); };
