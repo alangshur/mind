@@ -46,16 +46,6 @@ void TCPServer::close_connection() {
     this->active_connection = false;
 }
 
-packet_t TCPServer::build_packet(const std::string& protocol_str, 
-    const std::string& payload_str) {
-    assert(protocol_str.size() <= PROTOCOL_BYTES);
-    assert(payload_str.size() <= PAYLOAD_BYTES);
-    return {
-        protocol_str + std::string(PROTOCOL_BYTES - protocol_str.size(), '-'), 
-        payload_str + std::string(PAYLOAD_BYTES - payload_str.size(), '-')
-    };
-}
-
 TCPClient::TCPClient() : io_context(), resolver(this->io_context),
     socket_ptr(nullptr), active_connection(false) {}
 

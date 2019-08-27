@@ -1,6 +1,8 @@
 #ifndef PORTAL_H
 #define PORTAL_H
 
+#include <vector>
+#include <boost/algorithm/string.hpp>
 #include "util/logger.hpp"
 #include "util/tcp-server.hpp"
 
@@ -9,16 +11,15 @@
     aimed at defining a simple foundation for various 
     types of node network portal categories.
 */
-class EnginePortal {
+class EnginePortal : protected ThreadedOperator {
     public:
         virtual void run_portal() = 0;
 
     protected:
         EnginePortal(Logger& logger, EngineShutdownOperator& shutdown_operator)
-            : logger(logger), shutdown_operator(shutdown_operator) {}
+            : ThreadedOperator(shutdown_operator), logger(logger) {}
             
         Logger& logger;
-        EngineShutdownOperator& shutdown_operator;
 };
 
 /*
@@ -33,10 +34,6 @@ class EnginePortalIn : protected EnginePortal {
             EngineShutdownOperator& shutdown_operator) 
             : EnginePortal(logger, shutdown_operator), server(port){}
         virtual void run_portal() = 0;
-        void send_ack_packet(std::string protocol) 
-            { this->server.write_packet({protocol, ACK_PAYLOAD}); };
-        void send_nak_packet(std::string protocol) 
-            { this->server.write_packet({protocol, NAK_PAYLOAD}); };
 
         TCPServer server;
 };
@@ -52,10 +49,6 @@ class EnginePortalOut : protected EnginePortal {
         EnginePortalOut(Logger& logger, EngineShutdownOperator& shutdown_operator)
             : EnginePortal(logger, shutdown_operator) {}
         virtual void run_portal() = 0;
-        void send_ack_packet(std::string protocol) 
-            { this->client.write_packet({protocol, ACK_PAYLOAD}); };
-        void send_nak_packet(std::string protocol) 
-            { this->client.write_packet({protocol, NAK_PAYLOAD}); };
 
         TCPClient client;
 };

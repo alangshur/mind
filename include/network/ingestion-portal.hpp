@@ -1,5 +1,5 @@
-#ifndef UPDATE_PORTAL_H
-#define UPDATE_PORTAL_H
+#ifndef INGESTION_PORTAL_H
+#define INGESTION_PORTAL_H
 
 #include <queue>
 #include <atomic>
@@ -19,15 +19,11 @@ class EngineIngestionPortal : private EnginePortalIn {
             EngineShutdownOperator& shutdown_operator);
         ~EngineIngestionPortal();
         void run_portal(); 
-        void shutdown_portal();
 
         std::atomic<std::queue<cid>*> new_queue;
-        std::atomic<std::queue<std::pair<cid, cid>>*> update_queue;
+        std::atomic<std::queue<std::pair<cid, elo>>*> update_queue;
         EffSemaphore new_queue_sem;
-        EffSemaphore update_queue_sem;
-
-    private:
-        EffSemaphore binary_shutdown_sem;
+        EffSemaphore update_queue_sem;        
 };
 
 #endif

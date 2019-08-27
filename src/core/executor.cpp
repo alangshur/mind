@@ -3,10 +3,10 @@
 #include "core/executor.hpp"
 using namespace std;
 
-EngineExecutor::EngineExecutor(EngineIngestor& ingestor, EngineEloStore& elo_store, 
-    EngineContributionStore& contribution_store, Logger& logger) : ingestor(ingestor), 
-    contribution_store(contribution_store), ternary_shutdown_sem(0), 
-    shutdown_flag(false), logger(logger) {}
+EngineExecutor::EngineExecutor(EngineIngestionPortal& ingestor, EngineEloStore& elo_store, 
+    EngineContributionStore& contribution_store, Logger& logger, 
+    EngineShutdownOperator& shutdown_operator) : ThreadedOperator(shutdown_operator), ingestor(ingestor), 
+    contribution_store(contribution_store), ternary_shutdown_sem(0), logger(logger) {}
 
 void EngineExecutor::run_contribution_pipeline() {
     cid contribution_id;
@@ -15,7 +15,6 @@ void EngineExecutor::run_contribution_pipeline() {
 
             // fetch and add new contribution
             this->ingestor.new_queue_sem.wait();
-            if (this->shutdown_flag) break;
             contribution_id = this->ingestor.new_queue.load()->front();
             try { this->contribution_store.add_contribution(contribution_id); }
             catch (exception& e) { this->logger.log_error("EngineExecutor", e.what()); }
@@ -27,10 +26,8 @@ void EngineExecutor::run_contribution_pipeline() {
     catch(exception& e) {
         this->logger.log_error("EngineExecutor", "Fatal error in new contribution " 
             "pipeline: " + string(e.what()));
+        this->shutdown_operator.signal_node_shutdown();
     }
-
-    // signal shutdown
-    ternary_shutdown_sem.post();
 }
 
 void EngineExecutor::run_update_pipeline() {
@@ -43,7 +40,6 @@ void EngineExecutor::run_update_pipeline() {
 
             // fetch new update
             this->ingestor.update_queue_sem.wait();
-            if (this->shutdown_flag) break;
             contribution_ids = this->ingestor.update_queue.load()->front();
             this->ingestor.update_queue.load()->pop();
 
@@ -67,19 +63,4 @@ void EngineExecutor::run_update_pipeline() {
         this->logger.log_error("EngineExecutor", "Fatal error in contribution update " 
             "pipeline: " + string(e.what()));
     }
-
-    // signal shutdown
-    ternary_shutdown_sem.post();
-}
-
-void EngineExecutor::shutdown_pipelines() {
-
-    // initiate shutdown
-    this->shutdown_flag = true;
-    this->ingestor.new_queue_sem.post();
-    this->ingestor.update_queue_sem.post();
-
-    // wait for pipelines 
-    ternary_shutdown_sem.wait();
-    ternary_shutdown_sem.wait();
 }

@@ -3,11 +3,11 @@
 
 #include <atomic>
 #include "orchestrator.hpp"
-#include "io/ingestion.hpp"
 #include "util/semaphore.hpp"
 #include "core/elo-scoring.hpp"
 #include "core/infrastructure.hpp"
 #include "util/logger.hpp"
+#include "network/ingestion-portal.hpp"
 
 /*
     The engine executor class pieces together the entire 
@@ -16,19 +16,18 @@
     injects them into the stores framework defined within the 
     engine core after running them through the ELO rating module.
 */
-class EngineExecutor {
+class EngineExecutor : ThreadedOperator {
     public:
-        EngineExecutor(EngineIngestor& ingestor, EngineEloStore& elo_store, 
-            EngineContributionStore& contribution_store, Logger& logger);
+        EngineExecutor(EngineIngestionPortal& ingestor, EngineEloStore& elo_store, 
+            EngineContributionStore& contribution_store, Logger& logger, 
+            EngineShutdownOperator& shutdown_operator);
         void run_contribution_pipeline();
         void run_update_pipeline();
-        void shutdown_pipelines();
 
     private:
-        EngineIngestor& ingestor;
+        EngineIngestionPortal& ingestor;
         EngineContributionStore& contribution_store;
         EffSemaphore ternary_shutdown_sem;
-        std::atomic<bool> shutdown_flag;
         Logger& logger;
 };
 

@@ -29,9 +29,7 @@ class TCPServer {
         packet_t read_packet();
         void write_packet(const packet_t& packet);
         void close_connection();
-        static packet_t build_packet(const std::string& protocol_str, 
-            const std::string& payload_str);
-
+        
     private:
         boost::asio::io_context io_context;
         tcp::acceptor acceptor;
