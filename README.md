@@ -8,6 +8,7 @@ this project:
 - GNU g++ compiler: `$ brew install gcc`
 - GNU make: `$ brew install make`
 - Boost libraries: `$ brew install boost`  
+- MPICH library: `$ brew install mpich`
 
 ## Building
 
