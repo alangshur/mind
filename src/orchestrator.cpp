@@ -3,6 +3,12 @@ using namespace std;
 
 EngineOrchestrator::EngineOrchestrator() {}
 EngineOrchestrator::~EngineOrchestrator() {
+
+    // free mpi pointers
+
+    // free exec pointers
+
+    // free core pointers
     delete this->elo_store;
     delete this->contribution_store;
 }
@@ -25,6 +31,8 @@ void EngineOrchestrator::shutdown_node() {
 }
 
 void EngineOrchestrator::build_core() {
+
+    // build infrastructure core
     this->elo_store = new EngineEloStore();
     this->contribution_store = new EngineContributionStore(*(this->elo_store));
 
@@ -32,6 +40,13 @@ void EngineOrchestrator::build_core() {
 }
 
 void EngineOrchestrator::build_exec() {
+
+    // build ingestion executor
+    this->ingestion_exec = new EngineIngestionExecutor(*(this->contribution_store));
+    exec_threads.push_back(thread([&](EngineIngestionExecutor* exec) 
+        { exec->run_contribution_pipeline(); }, this->ingestion_exec));
+    exec_threads.push_back(thread([&](EngineIngestionExecutor* exec) 
+        { exec->run_update_pipeline(); }, this->ingestion_exec));
 
     // TODO: Build rest of exec
 }

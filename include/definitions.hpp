@@ -26,6 +26,7 @@ class EngineThread {
     protected: 
         Logger logger;
         void report_fatal_error();
+        virtual void shutdown() = 0;
 };
 
 #endif

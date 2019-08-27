@@ -18,20 +18,22 @@
 */
 class EngineIngestionExecutor : private EngineThread {
     public:
-        EngineIngestionExecutor(EloScorer& scorer, 
-            EngineContributionStore& contribution_store);
+        EngineIngestionExecutor(EngineContributionStore& contribution_store);
         ~EngineIngestionExecutor();
         void run_contribution_pipeline();
         void run_update_pipeline();
+        virtual void shutdown();
 
-    private:
-        EloScorer& scorer;
-        EngineContributionStore& contribution_store;
-        EffSemaphore ternary_shutdown_sem;
         std::atomic<std::queue<cid>*> new_queue;
         std::atomic<std::queue<std::tuple<cid, elo, bool>>*> update_queue;
         EffSemaphore new_queue_sem;
-        EffSemaphore update_queue_sem;   
+        EffSemaphore update_queue_sem;  
+
+    private:
+        EloScorer scorer;
+        EngineContributionStore& contribution_store; 
+        EffSemaphore ternary_shutdown_sem;
+        std::atomic<bool> shutdown_flag;
 };
 
 #endif

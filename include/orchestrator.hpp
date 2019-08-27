@@ -2,7 +2,9 @@
 #define ORCHESTRATOR_H
 
 #include <thread>
+#include <vector>
 #include "core/infrastructure.hpp"
+#include "exec/ingestion-executor.hpp"
 #include "definitions.hpp"
 
 /*
@@ -26,7 +28,17 @@ class EngineOrchestrator : EngineThread {
         void build_core();
         void build_exec();
         void build_mpi();
+        
+        // threads
+        std::vector<std::thread> mpi_threads;
+        std::vector<std::thread> exec_threads;        
 
+        // mpi pointers
+
+        // exec pointers
+        EngineIngestionExecutor* ingestion_exec;
+
+        // core pointers
         EngineEloStore* elo_store;
         EngineContributionStore* contribution_store;
 };

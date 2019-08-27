@@ -1,11 +1,11 @@
 #include "exec/ingestion-executor.hpp"
 using namespace std;
 
-EngineIngestionExecutor::EngineIngestionExecutor(EloScorer& scorer, 
-    EngineContributionStore& contribution_store) : scorer(scorer), 
-    contribution_store(contribution_store), ternary_shutdown_sem(0),
-    new_queue(new queue<cid>), update_queue(new queue<tuple<cid, elo, bool>>), 
-    new_queue_sem(0), update_queue_sem(0) {}
+EngineIngestionExecutor::EngineIngestionExecutor(EngineContributionStore& 
+    contribution_store) : new_queue(new queue<cid>), 
+    update_queue(new queue<tuple<cid, elo, bool>>), new_queue_sem(0), 
+    update_queue_sem(0), contribution_store(contribution_store), 
+    ternary_shutdown_sem(0), shutdown_flag(false) {}
 
 EngineIngestionExecutor::~EngineIngestionExecutor() {
     delete this->new_queue.load();
@@ -20,6 +20,7 @@ void EngineIngestionExecutor::run_contribution_pipeline() {
 
             // fetch new contribution
             this->new_queue_sem.wait();
+            if (this->shutdown_flag) break;
             contribution_id = this->new_queue.load()->front();
 
             // add new contribution
@@ -35,6 +36,9 @@ void EngineIngestionExecutor::run_contribution_pipeline() {
             "pipeline: " + string(e.what()) + ".");
         this->report_fatal_error();
     }
+
+    // notify shutdown
+    this->ternary_shutdown_sem.post();
 }
 
 void EngineIngestionExecutor::run_update_pipeline() {
@@ -46,6 +50,7 @@ void EngineIngestionExecutor::run_update_pipeline() {
 
             // fetch new update
             this->update_queue_sem.wait();
+            if (this->shutdown_flag) break;
             update = this->update_queue.load()->front();
             this->update_queue.load()->pop();
 
@@ -68,4 +73,15 @@ void EngineIngestionExecutor::run_update_pipeline() {
             "pipeline: " + string(e.what()) + ".");
         this->report_fatal_error();
     }
+
+    // notify shutdown
+    this->ternary_shutdown_sem.post();
+}
+
+void EngineIngestionExecutor::shutdown() {
+    this->shutdown_flag = true;
+    this->new_queue_sem.post();
+    this->update_queue_sem.post();
+    this->ternary_shutdown_sem.wait();
+    this->ternary_shutdown_sem.wait();
 }
