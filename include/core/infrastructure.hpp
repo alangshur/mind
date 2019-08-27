@@ -4,12 +4,17 @@
 #include <vector>
 #include <atomic>
 #include "util/rating-list.hpp"
-#include "orchestrator.hpp"
+#include "definitions.hpp"
+
+const elo ELO_INITIAL_RATING = 1000.0;
+const uint32_t ELO_STORE_SIZE = 10000;
+const uint32_t CONTRIBUTION_STORE_SIZE = 10000;
+const uint32_t INITIAL_CONTRIBUTION_COUNT = 0;
 
 typedef struct {
-    cid contribution_id;
-    elo rating;
-    c_node* position;
+    cid contribution_id = 0;
+    elo rating = 0;
+    c_node* position = nullptr;
 } contribution_t;
 
 /*
@@ -30,7 +35,8 @@ class EngineEloStore {
         c_node* add_contribution(cid contribution_id, elo init_rating);
         c_node* update_contribution(cid contribution_id, 
             c_node* position, elo old_rating, elo new_rating);
-        std::vector<EloList> store;
+            
+        std::vector<RatingList> store;
 };
 
 /*

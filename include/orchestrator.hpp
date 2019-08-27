@@ -1,30 +1,34 @@
 #ifndef ORCHESTRATOR_H
 #define ORCHESTRATOR_H
 
-#include <unistd.h>
+#include <thread>
+#include "core/infrastructure.hpp"
+#include "definitions.hpp"
 
-// define engine types
-typedef uint32_t cid;
-typedef float elo;
+/*
+    The engine orchestrator class is the central 
+    orchestration unit for a single node. It manages
+    the creation of all the individual modules, as well
+    as assigning them to threads and monitoring these 
+    child threads.
+*/
+class EngineOrchestrator : EngineThread {
+    public:
+        EngineOrchestrator();
+        ~EngineOrchestrator();
+        void execute();
 
-// define network parameters
-const uint32_t MAX_PACKET_SIZE = 40960;
-const uint32_t MAX_CLIENT = 1000;
+    private:
+        void launch_node();
+        void wait_node_shutdown();
+        void shutdown_node();
 
-// define manager paramaters
-const uint32_t INGEST_PACKET_BYTES = 14;
-const uint32_t INGEST_CID_BYTES = 6;
-const char* const SHUTDOWN_PACKET = "000000 000000";
+        void build_core();
+        void build_exec();
+        void build_mpi();
 
-// define ELO parameters
-const elo ELO_INITIAL_RATING = 1000.0;
-const float ELO_K_FACTOR = 20.0;
-const float ELO_N_SCALE = 400.0;
-const float ELO_EXP_BASE = 10.0;
-
-// define strucutre parameters
-const uint32_t ELO_STORE_SIZE = 5000;
-const uint32_t CONTRIBUTION_STORE_SIZE = 10000;
-const uint32_t INITIAL_CONTRIBUTION_COUNT = 0;
+        EngineEloStore* elo_store;
+        EngineContributionStore* contribution_store;
+};
 
 #endif

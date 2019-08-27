@@ -14,11 +14,3 @@ this project:
 To compile the project (within project directory): `$ make`  
 
 To run and compile the project: `$ make run`
-
-## Pinned Commands
-
-Kill all mind-engine processes:
-
-```bash
-ps | grep "./mind-engine" | cut -d ' ' -f1 | xargs kill
-```

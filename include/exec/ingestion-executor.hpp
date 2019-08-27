@@ -1,33 +1,37 @@
-#ifndef EXECUTOR_H
-#define EXECUTOR_H
+#ifndef INGESTION_EXECUTOR_H
+#define INGESTION_EXECUTOR_H
 
 #include <atomic>
-#include "orchestrator.hpp"
-#include "io/ingestion.hpp"
+#include <queue>
+#include <tuple>
 #include "util/semaphore.hpp"
-#include "core/elo-scoring.hpp"
+#include "util/elo-scorer.hpp"
 #include "core/infrastructure.hpp"
+#include "definitions.hpp"
 
 /*
     The engine executor class pieces together the entire 
-    input pipeline for the engine algorithm. It fetches data 
+    ingestion pipeline for the engine algorithm. It fetches data 
     (contributions and updates) that have been ingested and 
     injects them into the stores framework defined within the 
     engine core after running them through the ELO rating module.
 */
-class EngineExecutor {
+class EngineIngestionExecutor : private EngineThread {
     public:
-        EngineExecutor(EngineIngestor& ingestor, EngineEloStore& elo_store, 
+        EngineIngestionExecutor(EloScorer& scorer, 
             EngineContributionStore& contribution_store);
+        ~EngineIngestionExecutor();
         void run_contribution_pipeline();
         void run_update_pipeline();
-        void shutdown_pipelines();
 
     private:
-        EngineIngestor& ingestor;
+        EloScorer& scorer;
         EngineContributionStore& contribution_store;
         EffSemaphore ternary_shutdown_sem;
-        std::atomic<bool> shutdown_flag;
+        std::atomic<std::queue<cid>*> new_queue;
+        std::atomic<std::queue<std::tuple<cid, elo, bool>>*> update_queue;
+        EffSemaphore new_queue_sem;
+        EffSemaphore update_queue_sem;   
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include "core/infrastructure.hpp"
 using namespace std;
 
-EngineEloStore::EngineEloStore() : store(vector<EloList>(ELO_STORE_SIZE)) {}
+EngineEloStore::EngineEloStore() : store(ELO_STORE_SIZE) {}
 
 EngineEloStore::~EngineEloStore() {
     for (size_t i = 0; i < store.size(); i++) {
@@ -13,8 +13,6 @@ EngineEloStore::~EngineEloStore() {
 }
 
 c_node* EngineEloStore::add_contribution(cid contribution_id, elo init_rating) {
-    
-    // insert contribution and return position
     return (this->store)[(int) init_rating].add_contribution(contribution_id);
 }
 
@@ -30,10 +28,14 @@ c_node* EngineEloStore::update_contribution(cid contribution_id, c_node* positio
         .add_contribution(contribution_id);
 }
 
-EngineContributionStore::EngineContributionStore(EngineEloStore& elo_store) : elo_store(elo_store),
-    store(vector<atomic<contribution_t>>(CONTRIBUTION_STORE_SIZE)) {}
+EngineContributionStore::EngineContributionStore(EngineEloStore& elo_store) : 
+    elo_store(elo_store), store(CONTRIBUTION_STORE_SIZE) {}
 
 void EngineContributionStore::add_contribution(cid contribution_id) {
+    if ((this->store)[contribution_id].load().contribution_id > 0) {
+        throw runtime_error("Addition failed since contribution with ID " 
+            + to_string(contribution_id) + " already exists (cannot be added)");
+    }
 
     // build initial contribution
     contribution_t contribution;
@@ -47,6 +49,10 @@ void EngineContributionStore::add_contribution(cid contribution_id) {
 }
 
 void EngineContributionStore::update_contribution(cid contribution_id, elo new_rating) {
+    if ((this->store)[contribution_id].load().contribution_id == 0) {
+        throw runtime_error("Updated failed since contribution with ID " 
+            + to_string(contribution_id) + " doesn't exist");
+    }
 
     // update old contribution
     contribution_t contribution = (this->store)[contribution_id].load();

@@ -2,10 +2,10 @@
 #include "util/rating-list.hpp"
 using namespace std;
 
-EloList::EloList() : head(nullptr), tail(nullptr), list_mutex(mutex()), 
+RatingList::RatingList() : head(nullptr), tail(nullptr), list_mutex(mutex()), 
     total_nodes(0) {}
 
-c_node* EloList::add_contribution(cid id) {
+c_node* RatingList::add_contribution(cid id) {
     lock_guard<mutex> lg(this->list_mutex);
 
     // build node 
@@ -28,7 +28,7 @@ c_node* EloList::add_contribution(cid id) {
     return node;
 }
 
-void EloList::remove_contribution(c_node* node) {
+void RatingList::remove_contribution(c_node* node) {
     lock_guard<mutex> lg(this->list_mutex);
 
     // patch middle node
@@ -60,7 +60,7 @@ void EloList::remove_contribution(c_node* node) {
     this->total_nodes--;
 }
 
-cid EloList::cycle_front_contribution() {
+cid RatingList::cycle_front_contribution() {
     lock_guard<mutex> lg(this->list_mutex);
 
     // move head node to tail
@@ -77,7 +77,7 @@ cid EloList::cycle_front_contribution() {
     }
 }
 
-void EloList::free_list_memory() {
+void RatingList::free_list_memory() {
     if (this->total_nodes == 0) return;
     lock_guard<mutex> lg(this->list_mutex);
     

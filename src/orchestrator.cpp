@@ -1,64 +1,46 @@
-#include <stdio.h>
-#include <string>
-#include <iostream>
-#include <chrono>
-#include <ctime>
-#include <thread>
 #include "orchestrator.hpp"
-#include "io/ingestion.hpp"
-#include "core/infrastructure.hpp"
-#include "core/executor.hpp"
 using namespace std;
 
-// void ingestor_fn(EngineIngestor* ingestor) { 
-//     ingestor->run_ingestion(); 
-// }
+EngineOrchestrator::EngineOrchestrator() {}
+EngineOrchestrator::~EngineOrchestrator() {
+    delete this->elo_store;
+    delete this->contribution_store;
+}
 
-// void executor_fn_1(EngineExecutor* executor) { 
-//     executor->run_contribution_pipeline(); 
-// }
+void EngineOrchestrator::execute() {
+    // TODO: Implement
+}
 
-// void executor_fn_2(EngineExecutor* executor) { 
-//     executor->run_update_pipeline(); 
-// }
+void EngineOrchestrator::launch_node() {
+    // TODO: Implement
+}
 
-// int main(int argc, const char* argv[]) {
+void EngineOrchestrator::wait_node_shutdown() {
+    unique_lock<mutex> lk(shutdown_mutex);
+    shutdown_cv.wait(lk, []{ return shutdown_flag; });
+}
 
-//     // pipe descriptors
-//     int fd[2];
-//     pipe(fd);
-//     pid_t pid = fork();
+void EngineOrchestrator::shutdown_node() {
+    // TODO: Implement
+}
 
-//     // run child process
-//     if (pid == 0) {
-//         EngineEloStore* elo_store = new EngineEloStore();
-//         EngineContributionStore* contribution_store = new EngineContributionStore(*elo_store);
-//         EngineIngestor* ingestor = new EngineIngestor(fd[0], fd[1]);
-//         EngineExecutor* executor = new EngineExecutor(*ingestor, *elo_store, *contribution_store);
-//         thread t1(ingestor_fn, ingestor);
-//         thread t2(executor_fn_1, executor);
-//         thread t3(executor_fn_2, executor);
-//         sleep(1569325056);
-//     }
+void EngineOrchestrator::build_core() {
+    this->elo_store = new EngineEloStore();
+    this->contribution_store = new EngineContributionStore(*(this->elo_store));
 
-//     // run parent process
-//     else {
+    // TODO: Build rest of core
+}
 
-//         while(true) {
-//             string result;
-//             cout << "Enter result ('stop' to end sim): ";
-//             getline(cin, result);
-//             if (result == "stop") break;
-//             write(fd[1], result.c_str(), INGEST_PACKET_BYTES);
-//         }
-        
-//         close(fd[0]);
-//         close(fd[1]);
-//     }
+void EngineOrchestrator::build_exec() {
 
-//     return 0;
-// }
+    // TODO: Build rest of exec
+}
+
+void EngineOrchestrator::build_mpi() {
+
+    // TODO: Build mpi
+}
 
 int main(int argc, const char* argv[]) {
-    
+    return 0;
 }
