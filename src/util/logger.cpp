@@ -1,20 +1,21 @@
+#include <iostream>
+#include <ctime>
+#include <string>
 #include "util/logger.hpp"
 using namespace std;
 
-void Logger::log_message(const std::string& module, const string& message) {
+void Logger::log_message(const string& module, const string& message) {
     cout 
         << "[LOG] "
-        << this->node_num << "-"
         << module
         << " (" << this->get_formatted_time() << "): "
         << message
         << endl << flush;
 }
 
-void Logger::log_error(const std::string& module, const string& error) {
+void Logger::log_error(const string& module, const string& error) {
     cout 
         << "[ERROR] "
-        << this->node_num << "-"
         << module
         << " (" << this->get_formatted_time() << "): "
         << error

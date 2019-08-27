@@ -1,8 +1,8 @@
-#ifndef ELOLIST_H
-#define ELOLIST_H
+#ifndef RATING_LIST_H
+#define RATING_LIST_H
 
 #include <mutex>
-#include "orchestrator.hpp"
+#include "definitions.hpp"
 
 typedef struct c_node {
     cid id;
@@ -15,9 +15,9 @@ typedef struct c_node {
     linked list used to efficiently order and rank
     contributions within individual ELO buckets.
 */
-class EloList {
+class RatingList {
     public:
-        EloList();
+        RatingList();
         c_node* add_contribution(cid id);
         void remove_contribution(c_node* node);
         cid cycle_front_contribution();
