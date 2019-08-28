@@ -21,9 +21,9 @@ class EngineOrchestrator : EngineThread {
         void execute();
 
     private:
-        void launch_node();
-        void wait_node_shutdown();
-        void shutdown_node();
+        void launch_process();
+        void wait_process_shutdown();
+        void shutdown_process();
 
         void build_core();
         void build_exec();

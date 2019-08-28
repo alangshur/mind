@@ -1,5 +1,5 @@
-#ifndef NODE_PARAMS_H
-#define NODE_PARAMS_H
+#ifndef DEFINITIONS_H
+#define DEFINITIONS_H
 
 #include <condition_variable>
 #include <mutex>
@@ -14,7 +14,7 @@ typedef uint8_t distribution_rating;
 static std::mutex shutdown_mutex;
 static std::condition_variable shutdown_cv;
 static bool shutdown_flag = false;
-void signal_node_shutdown();
+void signal_process_shutdown();
 
 /*
     The engine thread class is a simple parent

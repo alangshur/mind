@@ -17,16 +17,16 @@ void EngineOrchestrator::execute() {
     // TODO: Implement
 }
 
-void EngineOrchestrator::launch_node() {
+void EngineOrchestrator::launch_process() {
     // TODO: Implement
 }
 
-void EngineOrchestrator::wait_node_shutdown() {
+void EngineOrchestrator::wait_process_shutdown() {
     unique_lock<mutex> lk(shutdown_mutex);
     shutdown_cv.wait(lk, []{ return shutdown_flag; });
 }
 
-void EngineOrchestrator::shutdown_node() {
+void EngineOrchestrator::shutdown_process() {
     // TODO: Implement
 }
 

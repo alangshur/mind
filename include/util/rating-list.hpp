@@ -27,7 +27,7 @@ class RatingList {
         c_node* head;
         c_node* tail;
         std::mutex list_mutex;
-        uint32_t total_nodes;
+        uint32_t total_c_nodes;
 };
 
 #endif
