@@ -2,13 +2,12 @@
 
 ## Dependencies
 
-The following dependencies are required for compiling and developing
+The following dependencies are required for coportalling and developing
 this project:
 
-- GNU g++ compiler: `$ brew install gcc`
+- GNU g++ coportaller: `$ brew install gcc`
 - GNU make: `$ brew install make`
 - Boost libraries: `$ brew install boost`  
-- MPICH library: `$ brew install mpich`
 
 ## Building
 

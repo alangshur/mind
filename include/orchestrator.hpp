@@ -27,13 +27,13 @@ class EngineOrchestrator : EngineThread {
 
         void build_core();
         void build_exec();
-        void build_mpi();
+        void build_portal();
         
         // threads
-        std::vector<std::thread> mpi_threads;
+        std::vector<std::thread> portal_threads;
         std::vector<std::thread> exec_threads;        
 
-        // mpi pointers
+        // portal pointers
 
         // exec pointers
         EngineIngestionExecutor* ingestion_exec;

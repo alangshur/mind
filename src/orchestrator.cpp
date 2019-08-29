@@ -1,10 +1,11 @@
+#include <iostream>
 #include "orchestrator.hpp"
 using namespace std;
 
 EngineOrchestrator::EngineOrchestrator() {}
 EngineOrchestrator::~EngineOrchestrator() {
 
-    // free mpi pointers
+    // free portal pointers
 
     // free exec pointers
 
@@ -51,11 +52,38 @@ void EngineOrchestrator::build_exec() {
     // TODO: Build rest of exec
 }
 
-void EngineOrchestrator::build_mpi() {
+void EngineOrchestrator::build_portal() {
 
-    // TODO: Build mpi
+    // TODO: Build portal
 }
 
+#include "util/tcp-server.hpp"
+#include "util/tcp-client.hpp"
+
+struct msg_t {
+    int id;
+    char body[32];
+};
+
 int main(int argc, const char* argv[]) {
+    
+    struct msg_t send_data = {0, "stop"};
+    TCPClient<struct msg_t> client;
+    client.send_connection("127.0.0.1", 5000);
+    client.write_packet(send_data);
+    client.close_connection();
+
+    struct msg_t message;
+    TCPServer<struct msg_t> server(5000);
+    do {
+        server.accept_connection();
+        message = server.read_packet();
+        cout << "Packet received!" << endl;
+        cout << "Message ID: " << message.id << endl;
+        cout << "Message Body: " << message.body << endl << endl;
+        server.close_connection();
+    }
+    while (string(message.body) != "stop");
+
     return 0;
 }

@@ -19,7 +19,7 @@ void signal_process_shutdown();
 /*
     The engine thread class is a simple parent
     class used to provide base utilities to 
-    individually threaded classes (such as mpi
+    individually threaded classes (such as portal
     and exec classes).
 */
 class EngineThread {
