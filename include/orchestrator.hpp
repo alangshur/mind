@@ -27,20 +27,20 @@ class EngineOrchestrator : EngineThread {
 
         void build_core();
         void build_exec();
-        void build_portal();
-        
-        // threads
-        std::vector<std::thread> portal_threads;
-        std::vector<std::thread> exec_threads;        
-
-        // portal pointers
-
-        // exec pointers
-        EngineIngestionExecutor* ingestion_exec;
+        void build_portal();       
 
         // core pointers
         EngineEloStore* elo_store;
         EngineContributionStore* contribution_store;
+
+        // exec pointers
+        EngineIngestionExecutor* ingestion_exec;
+
+        // portal pointers
+
+        // threads
+        std::vector<std::thread> portal_threads;
+        std::vector<std::thread> exec_threads; 
 };
 
 #endif

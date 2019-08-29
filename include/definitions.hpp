@@ -5,6 +5,7 @@
 #include <mutex>
 #include <stdlib.h>
 #include "util/logger.hpp"
+#include "util/semaphore.hpp"
 
 typedef uint32_t cid;
 typedef float elo;
@@ -22,11 +23,25 @@ void signal_process_shutdown();
     individually threaded classes (such as portal
     and exec classes).
 */
-class EngineThread {
+class EngineThread {        
     protected: 
-        Logger logger;
         void report_fatal_error();
+        void wait_shutdown();
+        virtual void run() = 0;
         virtual void shutdown() = 0;
+
+        Logger logger;
+        EffSemaphore binary_shutdown_sem;
+};
+
+class EngineExecutor : protected EngineThread {
+    virtual void run() = 0;
+    virtual void shutdown() = 0;
+};
+
+class EnginePortal : protected EngineThread {
+    virtual void run() = 0;
+    virtual void shutdown() = 0;
 };
 
 #endif

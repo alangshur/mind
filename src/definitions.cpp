@@ -9,3 +9,7 @@ void signal_process_shutdown() {
 void EngineThread::report_fatal_error() {
     signal_process_shutdown();
 }
+
+void EngineThread::wait_shutdown() {
+    this->binary_shutdown_sem.wait();
+}

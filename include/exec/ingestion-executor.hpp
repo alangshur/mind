@@ -1,13 +1,28 @@
 #ifndef INGESTION_EXECUTOR_H
 #define INGESTION_EXECUTOR_H
 
-#include <atomic>
+#include <mutex>
 #include <queue>
 #include <tuple>
 #include "util/semaphore.hpp"
 #include "util/elo-scorer.hpp"
 #include "core/infrastructure.hpp"
 #include "definitions.hpp"
+
+enum ingestion_type {
+    Contribution = 1,
+    Update = 2,
+};
+
+union ingestion_data {
+    cid contribution;
+    std::tuple<cid, elo, bool> update;
+};
+
+typedef struct {
+    enum ingestion_type type;
+    union ingestion_data data;
+} ingestion_t;
 
 /*
     The engine executor class pieces together the entire 
@@ -16,23 +31,22 @@
     injects them into the stores framework defined within the 
     engine core after running them through the ELO rating module.
 */
-class EngineIngestionExecutor : private EngineThread {
+class EngineIngestionExecutor : private EngineExecutor {
     public:
         EngineIngestionExecutor(EngineContributionStore& contribution_store);
-        ~EngineIngestionExecutor();
-        void run_contribution_pipeline();
-        void run_update_pipeline();
+        virtual void run();
         virtual void shutdown();
 
-        std::atomic<std::queue<cid>*> new_queue;
-        std::atomic<std::queue<std::tuple<cid, elo, bool>>*> update_queue;
-        EffSemaphore new_queue_sem;
-        EffSemaphore update_queue_sem;  
+        std::queue<ingestion_t> ingestion_queue;
+        std::mutex ingestion_queue_mutex;
+        EffSemaphore ingestion_queue_sem;
 
     private:
+        void handle_contribution(cid contribution);
+        elo handle_update(std::tuple<cid, elo, bool>& update);
+
         EloScorer scorer;
         EngineContributionStore& contribution_store; 
-        EffSemaphore ternary_shutdown_sem;
         std::atomic<bool> shutdown_flag;
 };
 

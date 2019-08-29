@@ -28,6 +28,7 @@ class BaseSemaphore {
 */
 class EffSemaphore {
     public:
+        EffSemaphore();
         EffSemaphore(int count);
         void post();
         void wait();

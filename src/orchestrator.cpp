@@ -45,9 +45,7 @@ void EngineOrchestrator::build_exec() {
     // build ingestion executor
     this->ingestion_exec = new EngineIngestionExecutor(*(this->contribution_store));
     exec_threads.push_back(thread([&](EngineIngestionExecutor* exec) 
-        { exec->run_contribution_pipeline(); }, this->ingestion_exec));
-    exec_threads.push_back(thread([&](EngineIngestionExecutor* exec) 
-        { exec->run_update_pipeline(); }, this->ingestion_exec));
+        { exec->run(); }, this->ingestion_exec));
 
     // TODO: Build rest of exec
 }
