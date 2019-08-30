@@ -14,9 +14,10 @@ class TCPServer {
     public:
         TCPServer(uint16_t port);
         void accept_connection();
-        T read_packet();
+        void read_packet(T& ds_packet);
         void write_packet(const T& ds_packet);
         void close_connection();
+        void close_acceptor();
 
     private:
         boost::asio::io_context io_context;
@@ -40,9 +41,8 @@ void TCPServer<T>::accept_connection() {
     this->active_connection = true;
 }
 
-#include <iostream>
 template <typename T>
-T TCPServer<T>::read_packet() {
+void TCPServer<T>::read_packet(T& ds_packet) {
     if (!this->active_connection) throw std::runtime_error("Packet read failed since "
         "there is no active connection.");
 
@@ -54,9 +54,7 @@ T TCPServer<T>::read_packet() {
         std::istreambuf_iterator<char>());
 
     // deserialize packet
-    T ds_packet;
     memcpy(&ds_packet, s_packet.c_str(), sizeof(T));
-    return ds_packet;
 }
 
 template <typename T>
@@ -83,6 +81,12 @@ void TCPServer<T>::close_connection() {
     // close active socket
     (*(this->socket_ptr)).close();
     this->active_connection = false;
+}
+
+template <typename T>
+void TCPServer<T>::close_acceptor() {
+    this->acceptor.cancel();
+    this->acceptor.close();
 }
 
 #endif

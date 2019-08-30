@@ -2,12 +2,18 @@
 
 void signal_process_shutdown() { 
     std::unique_lock<std::mutex> lk(shutdown_mutex);
-    shutdown_flag = true; 
+    global_shutdown_flag = true; 
     shutdown_cv.notify_one();
 }
 
+EngineThread::EngineThread() : shutdown_flag(false) {}
+
 void EngineThread::report_fatal_error() {
     signal_process_shutdown();
+}
+
+void EngineThread::notify_shutdown() {
+    this->binary_shutdown_sem.post();
 }
 
 void EngineThread::wait_shutdown() {

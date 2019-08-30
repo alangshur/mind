@@ -1,6 +1,7 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <stdlib.h>
@@ -14,7 +15,7 @@ typedef uint8_t distribution_rating;
 
 static std::mutex shutdown_mutex;
 static std::condition_variable shutdown_cv;
-static bool shutdown_flag = false;
+static bool global_shutdown_flag = false;
 void signal_process_shutdown();
 
 /*
@@ -24,14 +25,19 @@ void signal_process_shutdown();
     and exec classes).
 */
 class EngineThread {        
+    public:
+        EngineThread();
+
     protected: 
         void report_fatal_error();
+        void notify_shutdown();
         void wait_shutdown();
         virtual void run() = 0;
         virtual void shutdown() = 0;
 
         Logger logger;
         EffSemaphore binary_shutdown_sem;
+        std::atomic<bool> shutdown_flag;
 };
 
 /*

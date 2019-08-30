@@ -24,7 +24,7 @@ void EngineOrchestrator::launch_process() {
 
 void EngineOrchestrator::wait_process_shutdown() {
     unique_lock<mutex> lk(shutdown_mutex);
-    shutdown_cv.wait(lk, []{ return shutdown_flag; });
+    shutdown_cv.wait(lk, []{ return global_shutdown_flag; });
 }
 
 void EngineOrchestrator::shutdown_process() {
@@ -55,33 +55,8 @@ void EngineOrchestrator::build_portal() {
     // TODO: Build portal
 }
 
-#include "util/tcp-server.hpp"
-#include "util/tcp-client.hpp"
-
-struct msg_t {
-    int id;
-    char body[32];
-};
-
 int main(int argc, const char* argv[]) {
     
-    struct msg_t send_data = {0, "stop"};
-    TCPClient<struct msg_t> client;
-    client.send_connection("127.0.0.1", 5000);
-    client.write_packet(send_data);
-    client.close_connection();
-
-    struct msg_t message;
-    TCPServer<struct msg_t> server(5000);
-    do {
-        server.accept_connection();
-        message = server.read_packet();
-        cout << "Packet received!" << endl;
-        cout << "Message ID: " << message.id << endl;
-        cout << "Message Body: " << message.body << endl << endl;
-        server.close_connection();
-    }
-    while (string(message.body) != "stop");
 
     return 0;
 }

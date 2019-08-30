@@ -14,7 +14,7 @@ class TCPClient {
     public:
         TCPClient();
         void send_connection(const std::string& addr, uint16_t port);
-        T read_packet();
+        void read_packet(T& ds_packet);
         void write_packet(const T& ds_packet);
         void close_connection();
 
@@ -43,7 +43,7 @@ void TCPClient<T>::send_connection(const std::string& addr, uint16_t port) {
 }
 
 template <typename T>
-T TCPClient<T>::read_packet() {
+void TCPClient<T>::read_packet(T& ds_packet) {
     if (!this->active_connection) throw std::runtime_error("Packet read failed since "
         "there is no active connection.");
 
@@ -55,9 +55,7 @@ T TCPClient<T>::read_packet() {
         std::istreambuf_iterator<char>());
 
     // deserialize packet
-    T ds_packet;
     memcpy(&ds_packet, s_packet.c_str(), sizeof(T));
-    return ds_packet;
 }
 
 template <typename T>

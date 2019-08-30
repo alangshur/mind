@@ -3,7 +3,6 @@
 
 #include <mutex>
 #include <queue>
-#include <tuple>
 #include "util/semaphore.hpp"
 #include "util/elo-scorer.hpp"
 #include "core/infrastructure.hpp"
@@ -14,9 +13,19 @@ enum ingestion_type {
     Update = 2,
 };
 
+typedef struct {
+    cid contribution_id;
+} ingestion_contribution_t;  
+
+typedef struct {
+    cid contribution_id;
+    elo opponent_rating;
+    bool is_winner;
+} ingestion_update_t;
+
 union ingestion_data {
-    cid contribution;
-    std::tuple<cid, elo, bool> update;
+    ingestion_contribution_t contribution;
+    ingestion_update_t update;
 };
 
 typedef struct {
@@ -42,12 +51,11 @@ class EngineIngestionExecutor : private EngineExecutor {
         EffSemaphore ingestion_queue_sem;
 
     private:
-        void handle_contribution(cid contribution);
-        elo handle_update(std::tuple<cid, elo, bool>& update);
+        void handle_contribution(ingestion_contribution_t& contribution);
+        elo handle_update(ingestion_update_t& update);
 
         EloScorer scorer;
         EngineContributionStore& contribution_store; 
-        std::atomic<bool> shutdown_flag;
 };
 
 #endif
