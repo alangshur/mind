@@ -25,7 +25,7 @@ typedef struct {
 } ingestion_t;
 
 /*
-    The engine executor class pieces together the entire 
+    The EngineIngestionExecutor class pieces together the entire 
     ingestion pipeline for the engine algorithm. It fetches data 
     (contributions and updates) that have been ingested and 
     injects them into the stores framework defined within the 

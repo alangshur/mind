@@ -5,7 +5,7 @@
 using boost::asio::ip::tcp;
 
 /*
-    The generic TCP client class is a synchronous TCP framework for
+    The generic TCPClient class is a synchronous TCP framework for
     sending/receiving client TCP connections and sending/receiving 
     client packet communications over these connections.
 */

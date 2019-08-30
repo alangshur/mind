@@ -2,7 +2,7 @@
 #define LOGGER_H
 
 /*
-    The logger class is a simple logging utility to print
+    The Logger class is a simple logging utility to print
     formatted date-time messages and errors.
 */
 class Logger {

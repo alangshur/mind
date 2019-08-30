@@ -18,7 +18,7 @@ typedef struct {
 } contribution_t;
 
 /*
-    The ELO store is a linear vector-based data structure
+    The EngineEloStore class is a linear vector-based data structure
     that enumerates a range of ELO scores, with each index 
     containing a linked-list of contribution IDs. This construct 
     allows for the ratings of all the platform contributions 
@@ -40,7 +40,7 @@ class EngineEloStore {
 };
 
 /*
-    The contribution store is a linear vector-based data
+    The EngineContributionStore class is a linear vector-based data
     structure mounted on top of the ELO store described above.
     This system provides external indexing capabilities to 
     the store above to allow for individual contributions to be

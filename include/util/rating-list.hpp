@@ -11,7 +11,7 @@ typedef struct c_node {
 } c_node;
 
 /*
-    The ELO list class is a manually-implemented doubly
+    The RatingList class is a manually-implemented doubly
     linked list used to efficiently order and rank
     contributions within individual ELO buckets.
 */

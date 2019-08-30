@@ -5,7 +5,7 @@
 using boost::asio::ip::tcp;
 
 /*
-    The generic TCP server class is a synchronous TCP framework for
+    The generic TCPServer class is a synchronous TCP framework for
     sending/receiving server TCP connections and sending/receiving 
     server packet communications over these connections.
 */

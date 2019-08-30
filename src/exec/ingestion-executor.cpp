@@ -51,6 +51,12 @@ void EngineIngestionExecutor::run() {
     this->binary_shutdown_sem.post();
 }
 
+void EngineIngestionExecutor::shutdown() {
+    this->shutdown_flag = true;
+    this->ingestion_queue_sem.post();
+    this->binary_shutdown_sem.wait();
+}
+
 void EngineIngestionExecutor::handle_contribution(cid contribution) {
 
     // add new contribution
@@ -69,10 +75,4 @@ elo EngineIngestionExecutor::handle_update(tuple<cid, elo, bool>& update) {
     // update contribution
     this->contribution_store.update_contribution(get<0>(update), updated_elo);
     return updated_elo;
-}
-
-void EngineIngestionExecutor::shutdown() {
-    this->shutdown_flag = true;
-    this->ingestion_queue_sem.post();
-    this->binary_shutdown_sem.wait();
 }

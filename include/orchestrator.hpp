@@ -8,7 +8,7 @@
 #include "definitions.hpp"
 
 /*
-    The engine orchestrator class is the central 
+    The EngineOrchestrator class is the central 
     orchestration unit for a single node. It manages
     the creation of all the individual modules, as well
     as assigning them to threads and monitoring these 

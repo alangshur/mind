@@ -8,7 +8,7 @@ const float ELO_N_SCALE = 400.0;
 const float ELO_EXP_BASE = 10.0;
 
 /*
-    The engine scorer class contains a single method used
+    The EloScorer class contains a single method used
     used to quickly calculate updated ELO scores given a result 
     involving two previous ELO scores.
 */

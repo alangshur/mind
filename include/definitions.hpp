@@ -18,7 +18,7 @@ static bool shutdown_flag = false;
 void signal_process_shutdown();
 
 /*
-    The engine thread class is a simple parent
+    The EngineThread class is a simple parent
     class used to provide base utilities to 
     individually threaded classes (such as portal
     and exec classes).
@@ -34,11 +34,21 @@ class EngineThread {
         EffSemaphore binary_shutdown_sem;
 };
 
+/*
+    The EngineExecutor class is a simple wrapper
+    class that packages the EngineThread class
+    for individual executor classes.
+*/
 class EngineExecutor : protected EngineThread {
     virtual void run() = 0;
     virtual void shutdown() = 0;
 };
 
+/*
+    The EnginePortal class is a simple wrapper
+    class that packages the EngineThread class
+    for individual portal classes.
+*/
 class EnginePortal : protected EngineThread {
     virtual void run() = 0;
     virtual void shutdown() = 0;

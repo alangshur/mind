@@ -6,7 +6,7 @@
 #include <condition_variable>
 
 /*
-    The base semaphore class implements a naive version of 
+    The BaseSemaphore class implements a naive version of 
     the semaphore concurrency construct.
 */
 class BaseSemaphore {
@@ -22,8 +22,8 @@ class BaseSemaphore {
 };
 
 /*
-    The efficient semaphore class implements a more advanced 
-    and much faster version of the naive semaphore mounted using
+    The EffSemaphore class implements a more advanced 
+    and much faster version of the naive semaphore using
     concurrency directives from the new C++ thread package.
 */
 class EffSemaphore {
