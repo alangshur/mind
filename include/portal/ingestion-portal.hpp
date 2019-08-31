@@ -23,6 +23,7 @@ typedef union {
 class EngineIngestionPortal : private EnginePortal {
     public:
         EngineIngestionPortal(EngineIngestionExecutor& executor, uint16_t port);
+        virtual ~EngineIngestionPortal();
         virtual void run();
         virtual void shutdown();
 

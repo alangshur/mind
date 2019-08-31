@@ -8,11 +8,16 @@
 #include "util/logger.hpp"
 #include "util/semaphore.hpp"
 
+// define portal ports
+const uint16_t INGESTION_PORT = 9000;
+
+// define global types
 typedef uint32_t cid;
 typedef float elo;
 typedef uint8_t node;
 typedef uint8_t distribution_rating;
 
+// define global shutdown operators
 static std::mutex global_shutdown_mutex;
 static std::condition_variable global_shutdown_cv;
 static bool global_shutdown_flag = false;

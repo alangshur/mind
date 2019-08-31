@@ -5,6 +5,8 @@ using namespace std;
 EngineIngestionPortal::EngineIngestionPortal(EngineIngestionExecutor& executor,
     uint16_t port) : executor(executor), server(port) {}
 
+EngineIngestionPortal::~EngineIngestionPortal() {}
+
 void EngineIngestionPortal::run() {
     try {
         while (true) {

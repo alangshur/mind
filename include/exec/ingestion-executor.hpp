@@ -43,8 +43,9 @@ typedef struct {
 class EngineIngestionExecutor : private EngineExecutor {
     public:
         EngineIngestionExecutor(EngineContributionStore& contribution_store);
-        virtual void run();
-        virtual void shutdown();
+        virtual ~EngineIngestionExecutor();
+        void run();
+        void shutdown();
 
         std::queue<ingestion_t> ingestion_queue;
         std::mutex ingestion_queue_mutex;
