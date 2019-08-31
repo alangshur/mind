@@ -1,9 +1,9 @@
 #include "definitions.hpp"
 
 void signal_process_shutdown() { 
-    std::unique_lock<std::mutex> lk(shutdown_mutex);
+    std::unique_lock<std::mutex> lk(global_shutdown_mutex);
     global_shutdown_flag = true; 
-    shutdown_cv.notify_one();
+    global_shutdown_cv.notify_one();
 }
 
 EngineThread::EngineThread() : shutdown_flag(false) {}

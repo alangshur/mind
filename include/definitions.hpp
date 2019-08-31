@@ -13,8 +13,8 @@ typedef float elo;
 typedef uint8_t node;
 typedef uint8_t distribution_rating;
 
-static std::mutex shutdown_mutex;
-static std::condition_variable shutdown_cv;
+static std::mutex global_shutdown_mutex;
+static std::condition_variable global_shutdown_cv;
 static bool global_shutdown_flag = false;
 void signal_process_shutdown();
 

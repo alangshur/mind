@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <vector>
+#include "util/logger.hpp"
 #include "core/infrastructure.hpp"
 #include "exec/ingestion-executor.hpp"
 #include "definitions.hpp"
@@ -14,7 +15,7 @@
     as assigning them to threads and monitoring these 
     child threads.
 */
-class EngineOrchestrator : EngineThread {
+class EngineOrchestrator {
     public:
         EngineOrchestrator();
         ~EngineOrchestrator();
@@ -28,6 +29,8 @@ class EngineOrchestrator : EngineThread {
         void build_core();
         void build_exec();
         void build_portal();       
+
+        Logger logger;
 
         // core pointers
         EngineEloStore* elo_store;

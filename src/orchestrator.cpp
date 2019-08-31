@@ -8,6 +8,7 @@ EngineOrchestrator::~EngineOrchestrator() {
     // free portal pointers
 
     // free exec pointers
+    delete this->ingestion_exec;
 
     // free core pointers
     delete this->elo_store;
@@ -15,16 +16,20 @@ EngineOrchestrator::~EngineOrchestrator() {
 }
 
 void EngineOrchestrator::execute() {
-    // TODO: Implement
+    this->launch_process();
+    this->wait_process_shutdown();
+    this->shutdown_process();
 }
 
 void EngineOrchestrator::launch_process() {
-    // TODO: Implement
+    this->build_core();
+    this->build_exec();
+    this->build_portal();
 }
 
 void EngineOrchestrator::wait_process_shutdown() {
-    unique_lock<mutex> lk(shutdown_mutex);
-    shutdown_cv.wait(lk, []{ return global_shutdown_flag; });
+    unique_lock<mutex> lk(global_shutdown_mutex);
+    global_shutdown_cv.wait(lk, []{ return global_shutdown_flag; });
 }
 
 void EngineOrchestrator::shutdown_process() {
