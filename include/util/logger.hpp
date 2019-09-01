@@ -1,6 +1,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include <string>
+
 /*
     The Logger class is a simple logging utility to print
     formatted date-time messages and errors.

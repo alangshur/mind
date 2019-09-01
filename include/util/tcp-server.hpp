@@ -17,10 +17,12 @@ class TCPServer {
         void read_packet(T& ds_packet);
         void write_packet(const T& ds_packet);
         void force_write_packet(const T& ds_packet) noexcept;
+        void write_empty_loopback();
         bool has_active_connection();
         void close_connection();
         void force_close_connection() noexcept;
         void close_acceptor();
+        void stop_context();
 
     private:
         boost::asio::io_context io_context;
@@ -105,6 +107,11 @@ template <typename T>
 void TCPServer<T>::close_acceptor() {
     this->acceptor.cancel();
     this->acceptor.close();
+}
+
+template <typename T>
+void TCPServer<T>::stop_context() {
+    this->io_context.stop();
 }
 
 #endif

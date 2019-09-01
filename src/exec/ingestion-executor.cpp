@@ -44,8 +44,11 @@ void EngineIngestionExecutor::run() {
         }
     }
     catch(exception& e) {
-        this->logger.log_error("EngineIngestionExecutor", "Fatal error: " + string(e.what()) + ".");
-        this->report_fatal_error();
+        if (!this->shutdown_in_progress()) {
+            this->logger.log_error("EngineIngestionExecutor", "Fatal error: " 
+                + string(e.what()) + ".");
+            this->report_fatal_error();
+        }
     }
 
     this->notify_shutdown();

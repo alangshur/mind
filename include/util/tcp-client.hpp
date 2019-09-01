@@ -19,6 +19,7 @@ class TCPClient {
         void force_write_packet(const T& ds_packet) noexcept;
         void close_connection();
         void force_close_connection() noexcept;
+        void stop_context();
 
     private:
         boost::asio::io_context io_context;
@@ -96,6 +97,11 @@ template <typename T>
 void TCPClient<T>::force_close_connection() noexcept {
     try { this->close_connection(); }
     catch (...) {}
+}
+
+template <typename T>
+void TCPClient<T>::stop_context() {
+    this->io_context.stop();
 }
 
 #endif

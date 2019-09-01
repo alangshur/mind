@@ -2,7 +2,6 @@
 #define DEFINITIONS_H
 
 #include <atomic>
-#include <mutex>
 #include <stdlib.h>
 #include "util/logger.hpp"
 #include "util/semaphore.hpp"
@@ -16,8 +15,9 @@ typedef float elo;
 typedef uint8_t node;
 typedef uint8_t distribution_rating;
 
-// define global shutdown semaphore
+// define global shutdown operators
 extern EffSemaphore global_shutdown_sem;
+extern std::atomic<bool> global_shutdown_flag;
 
 /*
     The EngineThread class is a simple parent
@@ -31,6 +31,7 @@ class EngineThread {
 
     protected: 
         void report_fatal_error();
+        bool shutdown_in_progress();
         void notify_shutdown();
         void wait_shutdown();
         virtual void run() = 0;

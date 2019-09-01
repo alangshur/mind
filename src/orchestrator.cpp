@@ -112,18 +112,29 @@ int main(int argc, const char* argv[]) {
     // cout << "Response: " << packet_r.response << endl;
     // client.close_connection();
 
-    ingestion_packet_t packet;
-    packet.request.type = Update;
-    packet.request.data.update = {123, 900.0, true};
+    // ingestion_packet_t packet;
+    // packet.request.type = Update;
+    // packet.request.data.update = {123, 900.0, true};
     
-    client.send_connection("127.0.0.1", INGESTION_PORT);
-    client.write_packet(packet);
-    ingestion_packet_t packet_r;
-    client.read_packet(packet_r);
-    cout << "Response: " << packet_r.response << endl;
-    client.close_connection();
+    // client.send_connection("127.0.0.1", INGESTION_PORT);
+    // client.write_packet(packet);
+    // ingestion_packet_t packet_r;
+    // client.read_packet(packet_r);
+    // cout << "Response: " << packet_r.response << endl;
+    // client.close_connection();
 
-    // EngineOrchestrator orchestrator;
-    // orchestrator.execute();
+    // ingestion_packet_t packet;
+    // packet.request.type = Remove;
+    // packet.request.data.remove = {123};
+    
+    // client.send_connection("127.0.0.1", INGESTION_PORT);
+    // client.write_packet(packet);
+    // ingestion_packet_t packet_r;
+    // client.read_packet(packet_r);
+    // cout << "Response: " << packet_r.response << endl;
+    // client.close_connection();
+
+    EngineOrchestrator orchestrator;
+    orchestrator.execute();
     return 0;
 }
