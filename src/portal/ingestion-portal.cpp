@@ -34,7 +34,8 @@ void EngineIngestionPortal::run() {
     catch(exception& e) {
         this->server.force_close_connection();
         if (!this->shutdown_in_progress()) {
-            this->logger.log_error("EngineIngestionPortal", "Fatal error: " + string(e.what()) + ".");
+            this->logger.log_error("EngineIngestionPortal", "Fatal error: " 
+                + string(e.what()) + ".");
             this->report_fatal_error();
         }
     }
