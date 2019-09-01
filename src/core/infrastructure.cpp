@@ -29,7 +29,7 @@ c_node* EngineEloStore::update_contribution(cid contribution_id, c_node* positio
 }
 
 EngineContributionStore::EngineContributionStore(EngineEloStore& elo_store) : 
-    elo_store(elo_store), store(CONTRIBUTION_STORE_SIZE) {}
+    elo_store(elo_store) {}
 
 void EngineContributionStore::add_contribution(cid contribution_id) {
     if ((this->store)[contribution_id].load().contribution_id > 0) {
@@ -62,6 +62,17 @@ void EngineContributionStore::update_contribution(cid contribution_id, elo new_r
 
     // store new contribution
     (this->store)[contribution_id].store(contribution);
+}
+
+void EngineContributionStore::remove_contribution(cid contribution_id) {
+    if ((this->store)[contribution_id].load().contribution_id == 0) {
+        throw runtime_error("Remove failed since contribution with ID " 
+            + to_string(contribution_id) + " doesn't exist");
+    }
+
+    // remove old contribution
+    contribution_t blank_contribution;
+    (this->store)[contribution_id].store(blank_contribution);
 }
 
 elo EngineContributionStore::fetch_contribution_elo(cid contribution_id) {

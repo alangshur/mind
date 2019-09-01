@@ -1,6 +1,7 @@
 #ifndef INFRASTRUCTURE_H
 #define INFRASTRUCTURE_H
 
+#include <map>
 #include <vector>
 #include <atomic>
 #include "util/rating-list.hpp"
@@ -8,7 +9,6 @@
 
 const elo ELO_INITIAL_RATING = 1000.0;
 const uint32_t ELO_STORE_SIZE = 10000;
-const uint32_t CONTRIBUTION_STORE_SIZE = 10000;
 const uint32_t INITIAL_CONTRIBUTION_COUNT = 0;
 
 typedef struct {
@@ -40,7 +40,7 @@ class EngineEloStore {
 };
 
 /*
-    The EngineContributionStore class is a linear vector-based data
+    The EngineContributionStore class is a red-black-tree data
     structure mounted on top of the ELO store described above.
     This system provides external indexing capabilities to 
     the store above to allow for individual contributions to be
@@ -51,11 +51,12 @@ class EngineContributionStore {
         EngineContributionStore(EngineEloStore& elo_store);
         void add_contribution(cid contribution_id);
         void update_contribution(cid contribution_id, elo new_rating);
+        void remove_contribution(cid contribution_id);
         elo fetch_contribution_elo(cid contribution_id);
 
     private:
         EngineEloStore& elo_store;
-        std::vector<std::atomic<contribution_t>> store;
+        std::map<cid, std::atomic<contribution_t>> store;
 };
 
 #endif

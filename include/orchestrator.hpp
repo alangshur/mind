@@ -29,7 +29,10 @@ class EngineOrchestrator {
 
         void build_core();
         void build_exec();
-        void build_portal();       
+        void build_portal();      
+
+        void shutdown_portal();
+        void shutdown_exec();
 
         Logger logger;
 

@@ -22,7 +22,8 @@ void EngineOrchestrator::execute() {
         this->shutdown_process();
     }
     catch (exception& e) {
-
+        this->logger.log_error("EngineOrchestrator", "Error executing main orchestrator "
+            "pipeline: " + string(e.what()) + ".");
     }
 }
 
@@ -34,14 +35,14 @@ void EngineOrchestrator::launch_process() {
 }
 
 void EngineOrchestrator::wait_process_shutdown() {
-    this->logger.log_message("EngineOrchestrator", "Waiting for process shutdown.");
-    unique_lock<mutex> lk(global_shutdown_mutex);
-    global_shutdown_cv.wait(lk, []{ return global_shutdown_flag; });
+    this->logger.log_message("EngineOrchestrator", "Waiting for process shutdown.");  
+    global_shutdown_sem.wait();
 }
 
 void EngineOrchestrator::shutdown_process() {
     this->logger.log_message("EngineOrchestrator", "Shutting down process.");
-    // TODO: Implement
+    this->shutdown_portal();
+    this->shutdown_exec();
 }
 
 void EngineOrchestrator::build_core() {
@@ -73,8 +74,61 @@ void EngineOrchestrator::build_portal() {
     // TODO: Build rest of portal
 }
 
+void EngineOrchestrator::shutdown_portal() {
+
+    // shutdown portals
+    this->ingestion_portal->shutdown();
+
+    // join portals
+    for (size_t i = 0; i < this->portal_threads.size(); i++) {
+        this->portal_threads[i].join();
+    }
+}
+
+void EngineOrchestrator::shutdown_exec() {
+    
+    // shutdown executors
+    this->ingestion_exec->shutdown();
+
+    // join executors
+    for (size_t i = 0; i < this->exec_threads.size(); i++) {
+        this->exec_threads[i].join();
+    }
+}
+
+#include "util/tcp-client.hpp"
+
 int main(int argc, const char* argv[]) {
-    EngineOrchestrator orchestrator;
-    orchestrator.execute();
+
+    TCPClient<ingestion_packet_t> client;
+
+    // ingestion_packet_t packet;
+    // ingestion_contribution_t contribution;
+    // contribution.contribution_id = 124;
+    // packet.request.type = Contribution;
+    // packet.request.data.contribution = contribution;
+    
+    // client.send_connection("127.0.0.1", INGESTION_PORT);
+    // client.write_packet(packet);
+    // ingestion_packet_t packet_r;
+    // client.read_packet(packet_r);
+    // cout << "Response: " << packet_r.response << endl;
+    // client.close_connection();
+
+    ingestion_packet_t packet;
+    ingestion_update_t update;
+    update.contribution_id = 123;
+    packet.request.type = Update;
+    packet.request.data.update = {111, 1000.0, true};
+    
+    client.send_connection("127.0.0.1", INGESTION_PORT);
+    client.write_packet(packet);
+    ingestion_packet_t packet_r;
+    client.read_packet(packet_r);
+    cout << "Response: " << packet_r.response << endl;
+    client.close_connection();
+
+    // EngineOrchestrator orchestrator;
+    // orchestrator.execute();
     return 0;
 }

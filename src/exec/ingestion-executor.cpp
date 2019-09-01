@@ -32,13 +32,20 @@ void EngineIngestionExecutor::run() {
                 elo updated_rating = this->handle_update(update);
                 this->logger.log_message("EngineIngestionExecutor", "Successfully updated "
                     "contribution with ID " + to_string(update.contribution_id) + " to rating " 
-                    + to_string(updated_rating) + " .");
+                    + to_string(updated_rating) + ".");
+            }
+
+            // handle remove ingestion
+            else if (ingestion.type == Remove) {
+                ingestion_remove_t& remove = ingestion.data.remove;
+                this->handle_remove(remove);
+                this->logger.log_message("EngineIngestionExecutor", "Successfully removed "
+                    "contribution with ID " + to_string(remove.contribution_id) + ".");
             }
         }
     }
     catch(exception& e) {
-        this->logger.log_error("EngineIngestionExecutor", "Fatal error: " + 
-            string(e.what()) + ".");
+        this->logger.log_error("EngineIngestionExecutor", "Fatal error: " + string(e.what()) + ".");
         this->report_fatal_error();
     }
 
@@ -73,4 +80,8 @@ elo EngineIngestionExecutor::handle_update(ingestion_update_t& update) {
     // update contribution
     this->contribution_store.update_contribution(update.contribution_id, updated_rating);
     return updated_rating;
+}
+
+void EngineIngestionExecutor::handle_remove(ingestion_remove_t& remove) {
+    this->contribution_store.remove_contribution(remove.contribution_id);
 }

@@ -11,6 +11,7 @@
 enum ingestion_type {
     Contribution = 1,
     Update = 2,
+    Remove = 3
 };
 
 typedef struct {
@@ -23,9 +24,14 @@ typedef struct {
     bool is_winner;
 } ingestion_update_t;
 
+typedef struct {
+    cid contribution_id;
+} ingestion_remove_t;
+
 union ingestion_data {
     ingestion_contribution_t contribution;
     ingestion_update_t update;
+    ingestion_remove_t remove;
 };
 
 typedef struct {
@@ -54,6 +60,7 @@ class EngineIngestionExecutor : private EngineExecutor {
     private:
         void handle_contribution(ingestion_contribution_t& contribution);
         elo handle_update(ingestion_update_t& update);
+        void handle_remove(ingestion_remove_t& remove);
 
         EloScorer scorer;
         EngineContributionStore& contribution_store; 

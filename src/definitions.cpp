@@ -1,15 +1,13 @@
+#include <iostream>
 #include "definitions.hpp"
+using namespace std;
 
-void signal_process_shutdown() { 
-    std::unique_lock<std::mutex> lk(global_shutdown_mutex);
-    global_shutdown_flag = true; 
-    global_shutdown_cv.notify_one();
-}
+EffSemaphore global_shutdown_sem(0);
 
 EngineThread::EngineThread() : shutdown_flag(false) {}
 
 void EngineThread::report_fatal_error() {
-    signal_process_shutdown();
+    global_shutdown_sem.post();
 }
 
 void EngineThread::notify_shutdown() {

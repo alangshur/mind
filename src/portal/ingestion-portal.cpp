@@ -22,6 +22,9 @@ void EngineIngestionPortal::run() {
             this->executor.ingestion_queue.push(ingestion_req.request);
             lk.unlock();
 
+            // signal executor
+            this->executor.ingestion_queue_sem.post();
+
             // write response
             ingestion_packet_t ingestion_res;
             ingestion_res.response = ACK;

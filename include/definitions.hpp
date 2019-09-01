@@ -2,7 +2,6 @@
 #define DEFINITIONS_H
 
 #include <atomic>
-#include <condition_variable>
 #include <mutex>
 #include <stdlib.h>
 #include "util/logger.hpp"
@@ -17,11 +16,8 @@ typedef float elo;
 typedef uint8_t node;
 typedef uint8_t distribution_rating;
 
-// define global shutdown operators
-static std::mutex global_shutdown_mutex;
-static std::condition_variable global_shutdown_cv;
-static bool global_shutdown_flag = false;
-void signal_process_shutdown();
+// define global shutdown semaphore
+extern EffSemaphore global_shutdown_sem;
 
 /*
     The EngineThread class is a simple parent
