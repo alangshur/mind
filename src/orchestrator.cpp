@@ -2,7 +2,6 @@
 #include "orchestrator.hpp"
 using namespace std;
 
-EngineOrchestrator::EngineOrchestrator() {}
 EngineOrchestrator::~EngineOrchestrator() {
 
     // free portal pointers
@@ -103,10 +102,8 @@ int main(int argc, const char* argv[]) {
     TCPClient<ingestion_packet_t> client;
 
     // ingestion_packet_t packet;
-    // ingestion_contribution_t contribution;
-    // contribution.contribution_id = 124;
     // packet.request.type = Contribution;
-    // packet.request.data.contribution = contribution;
+    // packet.request.data.contribution = {123};
     
     // client.send_connection("127.0.0.1", INGESTION_PORT);
     // client.write_packet(packet);
@@ -116,10 +113,8 @@ int main(int argc, const char* argv[]) {
     // client.close_connection();
 
     ingestion_packet_t packet;
-    ingestion_update_t update;
-    update.contribution_id = 123;
     packet.request.type = Update;
-    packet.request.data.update = {111, 1000.0, true};
+    packet.request.data.update = {123, 900.0, true};
     
     client.send_connection("127.0.0.1", INGESTION_PORT);
     client.write_packet(packet);

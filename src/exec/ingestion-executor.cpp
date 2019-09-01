@@ -3,7 +3,6 @@ using namespace std;
 
 EngineIngestionExecutor::EngineIngestionExecutor(EngineContributionStore& 
     contribution_store) : contribution_store(contribution_store) {}
-
 EngineIngestionExecutor::~EngineIngestionExecutor() {}
 
 void EngineIngestionExecutor::run() {    

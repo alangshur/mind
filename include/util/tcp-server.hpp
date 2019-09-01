@@ -16,7 +16,10 @@ class TCPServer {
         void accept_connection();
         void read_packet(T& ds_packet);
         void write_packet(const T& ds_packet);
+        void force_write_packet(const T& ds_packet) noexcept;
+        bool has_active_connection();
         void close_connection();
+        void force_close_connection() noexcept;
         void close_acceptor();
 
     private:
@@ -74,6 +77,15 @@ void TCPServer<T>::write_packet(const T& ds_packet) {
 } 
 
 template <typename T>
+void TCPServer<T>::force_write_packet(const T& ds_packet) noexcept {
+    try { this->write_packet(ds_packet); }
+    catch (...) {}
+}
+
+template <typename T>
+bool TCPServer<T>::has_active_connection() { return this->active_connection; }
+
+template <typename T>
 void TCPServer<T>::close_connection() {
     if (!this->active_connection) throw std::runtime_error("Connection close failed since "
         "there is no active connection.");
@@ -81,6 +93,12 @@ void TCPServer<T>::close_connection() {
     // close active socket
     (*(this->socket_ptr)).close();
     this->active_connection = false;
+}
+
+template <typename T>
+void TCPServer<T>::force_close_connection() noexcept {
+    try { this->close_connection(); }
+    catch (...) {}
 }
 
 template <typename T>

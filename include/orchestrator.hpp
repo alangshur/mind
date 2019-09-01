@@ -18,7 +18,6 @@
 */
 class EngineOrchestrator {
     public:
-        EngineOrchestrator();
         ~EngineOrchestrator();
         void execute();
 

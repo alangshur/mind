@@ -16,7 +16,9 @@ class TCPClient {
         void send_connection(const std::string& addr, uint16_t port);
         void read_packet(T& ds_packet);
         void write_packet(const T& ds_packet);
+        void force_write_packet(const T& ds_packet) noexcept;
         void close_connection();
+        void force_close_connection() noexcept;
 
     private:
         boost::asio::io_context io_context;
@@ -75,6 +77,12 @@ void TCPClient<T>::write_packet(const T& ds_packet) {
 } 
 
 template <typename T>
+void TCPClient<T>::force_write_packet(const T& ds_packet) noexcept {
+    try { this->write_packet(ds_packet); }
+    catch (...) {}
+}
+
+template <typename T>
 void TCPClient<T>::close_connection() {
     if (!this->active_connection) throw std::runtime_error("Connection close failed since "
         "there is no active connection.");
@@ -82,6 +90,12 @@ void TCPClient<T>::close_connection() {
     // close active socket
     (*(this->socket_ptr)).close();
     this->active_connection = false;
+}
+
+template <typename T>
+void TCPClient<T>::force_close_connection() noexcept {
+    try { this->close_connection(); }
+    catch (...) {}
 }
 
 #endif
