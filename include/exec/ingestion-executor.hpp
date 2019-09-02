@@ -51,7 +51,6 @@ class EngineIngestionExecutor : private EngineExecutor {
         EngineIngestionExecutor(EngineContributionStore& contribution_store);
         virtual ~EngineIngestionExecutor();
         void add_ingestion(ingestion_t& ingestion);
-        void signal_ingestion();
         virtual void run();
         virtual void shutdown();
 

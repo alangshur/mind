@@ -16,9 +16,8 @@ void EngineIngestionPortal::run() {
             ingestion_packet_t ingestion_req;
             this->server.read_packet(ingestion_req);
 
-            // enqueue packet
+            // enqueue ingestion
             this->executor.add_ingestion(ingestion_req.request);
-            this->executor.signal_ingestion();
 
             // write response
             ingestion_packet_t ingestion_res;
