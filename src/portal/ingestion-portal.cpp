@@ -17,12 +17,8 @@ void EngineIngestionPortal::run() {
             this->server.read_packet(ingestion_req);
 
             // enqueue packet
-            unique_lock<mutex> lk(this->executor.ingestion_queue_mutex);
-            this->executor.ingestion_queue.push(ingestion_req.request);
-            lk.unlock();
-
-            // signal executor
-            this->executor.ingestion_queue_sem.post();
+            this->executor.add_ingestion(ingestion_req.request);
+            this->executor.signal_ingestion();
 
             // write response
             ingestion_packet_t ingestion_res;

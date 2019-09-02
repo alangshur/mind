@@ -13,7 +13,7 @@ c_node* RatingList::add_contribution(cid id) {
     node->id = id;
 
     // patch list routing
-    if (this->total_c_nodes == 0) {
+    if (!this->total_c_nodes) {
         this->head = node;
         this->tail = node;
     }
@@ -30,6 +30,7 @@ c_node* RatingList::add_contribution(cid id) {
 
 void RatingList::remove_contribution(c_node* node) {
     lock_guard<mutex> lg(this->list_mutex);
+    if (!this->total_c_nodes) return;
 
     // patch middle node
     if ((node->next != nullptr) && (node->prev != nullptr)) {
@@ -64,7 +65,7 @@ cid RatingList::cycle_front_contribution() {
     lock_guard<mutex> lg(this->list_mutex);
 
     // move head node to tail
-    if (this->total_c_nodes == 0) return 0;
+    if (!this->total_c_nodes) return 0;
     else if (this->total_c_nodes == 1) return this->head->id;
     else {
         c_node* cycle = this->head;
@@ -78,7 +79,7 @@ cid RatingList::cycle_front_contribution() {
 }
 
 void RatingList::free_list_memory() {
-    if (this->total_c_nodes == 0) return;
+    if (!this->total_c_nodes) return;
     lock_guard<mutex> lg(this->list_mutex);
     
     // iteratively remove nodes
@@ -86,4 +87,9 @@ void RatingList::free_list_memory() {
         c_node* curr_node = this->head;
         this->remove_contribution(curr_node);
     }
+}
+
+uint32_t RatingList::size() { 
+    lock_guard<mutex> lg(this->list_mutex);
+    return this->total_c_nodes; 
 }

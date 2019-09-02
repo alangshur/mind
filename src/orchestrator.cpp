@@ -96,41 +96,8 @@ void EngineOrchestrator::shutdown_exec() {
     }
 }
 
-#include "util/tcp-client.hpp"
-
 int main(int argc, const char* argv[]) {
-
-    TCPClient<ingestion_packet_t> client;
-    ingestion_packet_t packet;
-    ingestion_packet_t packet_r;
-
-    packet.request.type = Contribution;
-    packet.request.data.contribution = {123};
-
-    client.send_connection("127.0.0.1", INGESTION_PORT);
-    client.write_packet(packet);
-    client.read_packet(packet_r);
-    cout << "Response: " << packet_r.response << endl;
-    client.close_connection();
-
-    packet.request.type = Remove;
-    packet.request.data.remove = {123};
-    client.send_connection("127.0.0.1", INGESTION_PORT);
-    client.write_packet(packet);
-    client.read_packet(packet_r);
-    cout << "Response: " << packet_r.response << endl;
-    client.close_connection();
-
-    packet.request.type = Update;
-    packet.request.data.update = {123, 900.0, true};
-    client.send_connection("127.0.0.1", INGESTION_PORT);
-    client.write_packet(packet);
-    client.read_packet(packet_r);
-    cout << "Response: " << packet_r.response << endl;
-    client.close_connection();
-
-    // EngineOrchestrator orchestrator;
-    // orchestrator.execute();
-    // cout << "Done!" << endl << flush;
+    EngineOrchestrator orchestrator;
+    orchestrator.execute();
     return 0;
 }

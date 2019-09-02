@@ -22,6 +22,7 @@ class RatingList {
         void remove_contribution(c_node* node);
         cid cycle_front_contribution();
         void free_list_memory();
+        uint32_t size();
     
     private:
         c_node* head;

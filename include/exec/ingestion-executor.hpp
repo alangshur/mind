@@ -50,18 +50,19 @@ class EngineIngestionExecutor : private EngineExecutor {
     public:
         EngineIngestionExecutor(EngineContributionStore& contribution_store);
         virtual ~EngineIngestionExecutor();
-        void run();
-        void shutdown();
-
-        std::queue<ingestion_t> ingestion_queue;
-        std::mutex ingestion_queue_mutex;
-        EffSemaphore ingestion_queue_sem;
+        void add_ingestion(ingestion_t& ingestion);
+        void signal_ingestion();
+        virtual void run();
+        virtual void shutdown();
 
     private:
         void handle_contribution(ingestion_contribution_t& contribution);
         elo handle_update(ingestion_update_t& update);
         void handle_remove(ingestion_remove_t& remove);
 
+        std::queue<ingestion_t> ingestion_queue;
+        std::mutex ingestion_queue_mutex;
+        EffSemaphore ingestion_queue_sem;
         EloScorer scorer;
         EngineContributionStore& contribution_store; 
 };

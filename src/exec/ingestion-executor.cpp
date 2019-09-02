@@ -5,6 +5,15 @@ EngineIngestionExecutor::EngineIngestionExecutor(EngineContributionStore&
     contribution_store) : contribution_store(contribution_store) {}
 EngineIngestionExecutor::~EngineIngestionExecutor() {}
 
+void EngineIngestionExecutor::add_ingestion(ingestion_t& ingestion) {
+    unique_lock<mutex> lk(this->ingestion_queue_mutex);
+    this->ingestion_queue.push(ingestion);
+}
+
+void EngineIngestionExecutor::signal_ingestion() {
+    this->ingestion_queue_sem.post();
+}
+
 void EngineIngestionExecutor::run() {    
     try {
         while (true) {

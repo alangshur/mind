@@ -1,8 +1,11 @@
 #ifndef INFRASTRUCTURE_H
 #define INFRASTRUCTURE_H
 
+#include <mutex>
+#include <set>
 #include <map>
 #include <vector>
+#include <utility>
 #include <atomic>
 #include "util/rating-list.hpp"
 #include "definitions.hpp"
@@ -35,6 +38,9 @@ class EngineEloStore {
         c_node* add_contribution(cid contribution_id, elo init_rating);
         c_node* update_contribution(cid contribution_id, 
             c_node* position, elo old_rating, elo new_rating);
+        void remove_contribution(elo rating, c_node* position);
+        uint32_t get_rating_list_size(elo rating);
+        cid cycle_front_contribution(uint32_t elo_bucket);
             
         std::vector<RatingList> store;
 };
@@ -53,10 +59,16 @@ class EngineContributionStore {
         void update_contribution(cid contribution_id, elo new_rating);
         void remove_contribution(cid contribution_id);
         elo fetch_contribution_elo(cid contribution_id);
+        bool verify_contribution(cid contribution_id);
+        cid attempt_fetch_match_item();
+        std::pair<cid, cid> fetch_match_pair();
 
-    private:
+    private:    
         EngineEloStore& elo_store;
         std::map<cid, std::atomic<contribution_t>> store;
+        std::mutex store_mutex;
+        std::set<uint32_t> filled_elo_buckets;
+        std::mutex filled_elo_buckets_mutex;
 };
 
 #endif
