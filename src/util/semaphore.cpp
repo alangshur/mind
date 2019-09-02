@@ -15,6 +15,8 @@ void BaseSemaphore::wait() {
     this->m_count--;
 }
 
+EffSemaphore::EffSemaphore() : m_count(0), m_semaphore(0) {}
+
 EffSemaphore::EffSemaphore(int count) : m_count(count), m_semaphore(0) {}
 
 void EffSemaphore::post() {

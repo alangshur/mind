@@ -1,11 +1,25 @@
+#include <iostream>
 #include "definitions.hpp"
+using namespace std;
 
-void signal_node_shutdown() { 
-    std::unique_lock<std::mutex> lk(shutdown_mutex);
-    shutdown_flag = true; 
-    shutdown_cv.notify_one();
-}
+EffSemaphore global_shutdown_sem(0);
+atomic<bool> global_shutdown_flag(false);
+
+EngineThread::EngineThread() : shutdown_flag(false) {}
 
 void EngineThread::report_fatal_error() {
-    signal_node_shutdown();
+    global_shutdown_sem.post();
+    global_shutdown_flag = true;
+}
+
+bool EngineThread::shutdown_in_progress() {
+    return global_shutdown_flag;
+}
+
+void EngineThread::notify_shutdown() {
+    this->binary_shutdown_sem.post();
+}
+
+void EngineThread::wait_shutdown() {
+    this->binary_shutdown_sem.wait();
 }

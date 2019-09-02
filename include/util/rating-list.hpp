@@ -11,7 +11,7 @@ typedef struct c_node {
 } c_node;
 
 /*
-    The ELO list class is a manually-implemented doubly
+    The RatingList class is a manually-implemented doubly
     linked list used to efficiently order and rank
     contributions within individual ELO buckets.
 */
@@ -22,12 +22,13 @@ class RatingList {
         void remove_contribution(c_node* node);
         cid cycle_front_contribution();
         void free_list_memory();
+        uint32_t size();
     
     private:
         c_node* head;
         c_node* tail;
         std::mutex list_mutex;
-        uint32_t total_nodes;
+        uint32_t total_c_nodes;
 };
 
 #endif

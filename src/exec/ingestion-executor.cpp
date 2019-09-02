@@ -1,71 +1,95 @@
 #include "exec/ingestion-executor.hpp"
 using namespace std;
 
-EngineIngestionExecutor::EngineIngestionExecutor(EloScorer& scorer, 
-    EngineContributionStore& contribution_store) : scorer(scorer), 
-    contribution_store(contribution_store), ternary_shutdown_sem(0),
-    new_queue(new queue<cid>), update_queue(new queue<tuple<cid, elo, bool>>), 
-    new_queue_sem(0), update_queue_sem(0) {}
+EngineIngestionExecutor::EngineIngestionExecutor(EngineContributionStore& 
+    contribution_store) : contribution_store(contribution_store) {}
+EngineIngestionExecutor::~EngineIngestionExecutor() {}
 
-EngineIngestionExecutor::~EngineIngestionExecutor() {
-    delete this->new_queue.load();
-    delete this->update_queue.load();
+void EngineIngestionExecutor::add_ingestion(ingestion_t& ingestion) {
+    unique_lock<mutex> lk(this->ingestion_queue_mutex);
+    this->ingestion_queue.push(ingestion);
+    this->ingestion_queue_sem.post();
 }
 
-void EngineIngestionExecutor::run_contribution_pipeline() {
-    cid contribution_id;
-    
+void EngineIngestionExecutor::run() {    
     try {
         while (true) {
 
-            // fetch new contribution
-            this->new_queue_sem.wait();
-            contribution_id = this->new_queue.load()->front();
+            // fetch ingestion
+            this->ingestion_queue_sem.wait();
+            if (this->shutdown_flag) break;
+            unique_lock<mutex> lk(this->ingestion_queue_mutex);
+            ingestion_t ingestion = this->ingestion_queue.front();
+            this->ingestion_queue.pop();
+            lk.unlock();
 
-            // add new contribution
-            try { this->contribution_store.add_contribution(contribution_id); }
-            catch (exception& e) { this->logger.log_error("EngineIngestionExecutor", e.what()); }
-            this->logger.log_message("EngineIngestionExecutor", "Successfully added "
-                "contribution with ID " + to_string(contribution_id) + ".");
-            this->new_queue.load()->pop();
+            // handle contribution ingestion
+            if (ingestion.type == Contribution) {
+                ingestion_contribution_t& contribution = ingestion.data.contribution;
+                this->handle_contribution(contribution);
+                this->logger.log_message("EngineIngestionExecutor", "Successfully added "
+                    "contribution with ID " + to_string(contribution.contribution_id) + ".");
+            }
+
+            // handle update ingestion
+            else if (ingestion.type == Update) {
+                ingestion_update_t& update = ingestion.data.update;
+                elo updated_rating = this->handle_update(update);
+                this->logger.log_message("EngineIngestionExecutor", "Successfully updated "
+                    "contribution with ID " + to_string(update.contribution_id) + " to rating " 
+                    + to_string(updated_rating) + ".");
+            }
+
+            // handle remove ingestion
+            else if (ingestion.type == Remove) {
+                ingestion_remove_t& remove = ingestion.data.remove;
+                this->handle_remove(remove);
+                this->logger.log_message("EngineIngestionExecutor", "Successfully removed "
+                    "contribution with ID " + to_string(remove.contribution_id) + ".");
+            }
         }
     }
     catch(exception& e) {
-        this->logger.log_error("EngineIngestionExecutor", "Fatal error in new contribution " 
-            "pipeline: " + string(e.what()) + ".");
-        this->report_fatal_error();
+        if (!this->shutdown_in_progress()) {
+            this->logger.log_error("EngineIngestionExecutor", "Fatal error: " 
+                + string(e.what()) + ".");
+            this->report_fatal_error();
+        }
     }
+
+    this->notify_shutdown();
 }
 
-void EngineIngestionExecutor::run_update_pipeline() {
-    tuple<cid, elo, bool> update;
-    elo updated_elo;
+void EngineIngestionExecutor::shutdown() {
 
-    try {
-        while (true) {
+    // trigger shutdown
+    this->shutdown_flag = true;
+    this->ingestion_queue_sem.post();
 
-            // fetch new update
-            this->update_queue_sem.wait();
-            update = this->update_queue.load()->front();
-            this->update_queue.load()->pop();
+    // wait for shutdown
+    this->wait_shutdown();
+    this->logger.log_message("EngineIngestionExecutor", "Successfully shutdown "
+        "ingestion executor.");
+}
 
-            // calculate updated ELO score
-            updated_elo = this->scorer.calculate_rating(
-                this->contribution_store.fetch_contribution_elo(get<0>(update)),
-                get<1>(update),
-                get<2>(update)
-            );
+void EngineIngestionExecutor::handle_contribution(ingestion_contribution_t& contribution) {
+    this->contribution_store.add_contribution(contribution.contribution_id);
+}
 
-            // update contributions
-            this->contribution_store.update_contribution(get<0>(update), updated_elo);
-            this->logger.log_message("EngineIngestionExecutor", "Successfully updated "
-                "contribution with ID " + to_string(get<0>(update)) + " to ELO " 
-                + to_string(updated_elo) + " .");
-        }
-    }
-    catch(exception& e) {
-        this->logger.log_error("EngineIngestionExecutor", "Fatal error in update "
-            "pipeline: " + string(e.what()) + ".");
-        this->report_fatal_error();
-    }
+elo EngineIngestionExecutor::handle_update(ingestion_update_t& update) {
+
+    // calculate new ELO rating
+    elo updated_rating = this->scorer.calculate_rating(
+        this->contribution_store.fetch_contribution_elo(update.contribution_id),
+        update.opponent_rating,
+        update.is_winner
+    );
+
+    // update contribution
+    this->contribution_store.update_contribution(update.contribution_id, updated_rating);
+    return updated_rating;
+}
+
+void EngineIngestionExecutor::handle_remove(ingestion_remove_t& remove) {
+    this->contribution_store.remove_contribution(remove.contribution_id);
 }
