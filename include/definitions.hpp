@@ -8,6 +8,7 @@
 
 // define portal ports
 const uint16_t INGESTION_PORT = 9000;
+const uint16_t MATCH_PORT = 9001;
 
 // define global types
 typedef uint32_t cid;

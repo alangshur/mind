@@ -5,9 +5,12 @@ using namespace std;
 EngineOrchestrator::~EngineOrchestrator() {
 
     // free portal pointers
+    delete this->ingestion_portal;
+    delete this->match_portal;
 
     // free exec pointers
     delete this->ingestion_exec;
+    delete this->match_exec;
 
     // free core pointers
     delete this->elo_store;
@@ -15,6 +18,8 @@ EngineOrchestrator::~EngineOrchestrator() {
 }
 
 void EngineOrchestrator::execute() {
+
+    // execute orchestrator pipeline
     try {
         this->launch_process();
         this->wait_process_shutdown();
@@ -24,6 +29,8 @@ void EngineOrchestrator::execute() {
         this->logger.log_error("EngineOrchestrator", "Error executing main orchestrator "
             "pipeline: " + string(e.what()) + ".");
     }
+
+    // exit process
     exit(0);
 }
 
@@ -50,8 +57,6 @@ void EngineOrchestrator::build_core() {
     // build infrastructure core
     this->elo_store = new EngineEloStore();
     this->contribution_store = new EngineContributionStore(*(this->elo_store));
-
-    // TODO: Build rest of core
 }
 
 void EngineOrchestrator::build_exec() {
@@ -61,7 +66,10 @@ void EngineOrchestrator::build_exec() {
     exec_threads.push_back(thread([&](EngineIngestionExecutor* exec) 
         { exec->run(); }, this->ingestion_exec));
 
-    // TODO: Build rest of exec
+    // build match executor
+    this->match_exec = new EngineMatchExecutor(*(this->contribution_store));
+    exec_threads.push_back(thread([&](EngineMatchExecutor* exec)
+        { exec->run(); }, this->match_exec));
 }
 
 void EngineOrchestrator::build_portal() {
@@ -71,13 +79,17 @@ void EngineOrchestrator::build_portal() {
     portal_threads.push_back(thread([&](EngineIngestionPortal* portal) 
         { portal->run(); }, this->ingestion_portal));
 
-    // TODO: Build rest of portal
+    // build match portal
+    this->match_portal = new EngineMatchPortal(*(this->match_exec), MATCH_PORT);
+    portal_threads.push_back(thread([&](EngineMatchPortal* portal) 
+        { portal->run(); }, this->match_portal));
 }
 
 void EngineOrchestrator::shutdown_portal() {
 
     // shutdown portals
     this->ingestion_portal->shutdown();
+    this->match_portal->shutdown();
 
     // join portals
     for (size_t i = 0; i < this->portal_threads.size(); i++) {
@@ -89,6 +101,7 @@ void EngineOrchestrator::shutdown_exec() {
     
     // shutdown executors
     this->ingestion_exec->shutdown();
+    this->match_exec->shutdown();
 
     // join executors
     for (size_t i = 0; i < this->exec_threads.size(); i++) {

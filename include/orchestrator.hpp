@@ -6,7 +6,9 @@
 #include "util/logger.hpp"
 #include "core/infrastructure.hpp"
 #include "exec/ingestion-executor.hpp"
+#include "exec/match-executor.hpp"
 #include "portal/ingestion-portal.hpp"
+#include "portal/match-portal.hpp"
 #include "definitions.hpp"
 
 /*
@@ -41,9 +43,11 @@ class EngineOrchestrator {
 
         // exec pointers
         EngineIngestionExecutor* ingestion_exec;
+        EngineMatchExecutor* match_exec;
 
         // portal pointers
         EngineIngestionPortal* ingestion_portal;
+        EngineMatchPortal* match_portal;
 
         // threads
         std::vector<std::thread> portal_threads;

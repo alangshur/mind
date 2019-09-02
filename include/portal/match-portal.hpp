@@ -20,10 +20,10 @@ typedef union {
     on top of a TCP server to read match data and 
     feed the result into the match executor. 
 */
-class EnigneMatchPortal : private EnginePortal {
+class EngineMatchPortal : private EnginePortal {
     public:
-        EnigneMatchPortal(EngineMatchExecutor& executor, uint16_t port);
-        virtual ~EnigneMatchPortal();
+        EngineMatchPortal(EngineMatchExecutor& executor, uint16_t port);
+        virtual ~EngineMatchPortal();
         virtual void run();
         virtual void shutdown();
 

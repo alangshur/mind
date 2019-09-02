@@ -1,11 +1,11 @@
 #include "portal/match-portal.hpp"
 using namespace std;
 
-EnigneMatchPortal::EnigneMatchPortal(EngineMatchExecutor& executor,
+EngineMatchPortal::EngineMatchPortal(EngineMatchExecutor& executor,
     uint16_t port) : executor(executor), server(port) {}
-EnigneMatchPortal::~EnigneMatchPortal() {}
+EngineMatchPortal::~EngineMatchPortal() {}
 
-void EnigneMatchPortal::run() {
+void EngineMatchPortal::run() {
     try {
         while (true) {
 
@@ -30,7 +30,7 @@ void EnigneMatchPortal::run() {
     catch(exception& e) {
         this->server.force_close_connection();
         if (!this->shutdown_in_progress()) {
-            this->logger.log_error("EnigneMatchPortal", "Fatal error: " 
+            this->logger.log_error("EngineMatchPortal", "Fatal error: " 
                 + string(e.what()) + ".");
             this->report_fatal_error();
         }
@@ -39,7 +39,7 @@ void EnigneMatchPortal::run() {
     this->notify_shutdown();
 }
 
-void EnigneMatchPortal::shutdown() {
+void EngineMatchPortal::shutdown() {
     
     // trigger shutdown
     this->shutdown_flag = true;
@@ -47,6 +47,6 @@ void EnigneMatchPortal::shutdown() {
 
     // wait for shutdown
     this->wait_shutdown();
-    this->logger.log_message("EnigneMatchPortal", "Successfully shutdown "
+    this->logger.log_message("EngineMatchPortal", "Successfully shutdown "
         "match portal.");
 }
