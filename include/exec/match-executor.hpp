@@ -10,6 +10,7 @@
 
 const uint32_t MATCH_QUEUE_REFILL_SIZE = 5;
 const uint32_t MATCH_QUEUE_REFILL_LIMIT = 15;
+const uint32_t MIN_MATCH_CONTRIBUTION_COUNT = 5;
 
 typedef struct {
     cid contribution_id_a;

@@ -2,7 +2,10 @@
 using namespace std;
 
 EngineMatchPortal::EngineMatchPortal(EngineMatchExecutor& executor,
-    uint16_t port) : executor(executor), server(port) {}
+    uint16_t port) : executor(executor), server(port) {
+    this->logger.log_message("EngineMatchPortal", "Initializing match portal.");
+}
+
 EngineMatchPortal::~EngineMatchPortal() {}
 
 void EngineMatchPortal::run() {

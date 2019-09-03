@@ -54,6 +54,7 @@ void EngineContributionStore::add_contribution(cid contribution_id) {
         ELO_INITIAL_RATING);
 
     // store new contribution
+    this->contribution_count++;
     unique_lock<mutex> store_lk(this->store_mutex);
     (this->store)[contribution_id].store(contribution);
     store_lk.unlock();
@@ -92,6 +93,7 @@ void EngineContributionStore::remove_contribution(cid contribution_id) {
     this->elo_store.remove_contribution(contribution.rating, contribution.position);
 
     // remove contribution in contribution store
+    this->contribution_count--;
     unique_lock<mutex> store_lk(this->store_mutex);
     this->store.erase(contribution_id);
     store_lk.unlock();
@@ -137,4 +139,8 @@ pair<cid, cid> EngineContributionStore::fetch_match_pair() {
     }
     while (match_pair.second != match_pair.first);
     return match_pair;
+}
+
+uint32_t EngineContributionStore::get_contribution_count() {
+    return this->contribution_count;
 }

@@ -62,6 +62,7 @@ class EngineContributionStore {
         bool verify_contribution(cid contribution_id);
         cid attempt_fetch_match_item();
         std::pair<cid, cid> fetch_match_pair();
+        uint32_t get_contribution_count();
 
     private:    
         EngineEloStore& elo_store;
@@ -69,6 +70,7 @@ class EngineContributionStore {
         std::mutex store_mutex;
         std::set<uint32_t> filled_elo_buckets;
         std::mutex filled_elo_buckets_mutex;
+        std::atomic<uint32_t> contribution_count;
 };
 
 #endif

@@ -5,14 +5,9 @@
 #include "exec/ingestion-executor.hpp"
 #include "definitions.hpp"
 
-enum packet_response {
-    ACK = 1,
-    NAK = 2
-};
-
 typedef union {
     ingestion_t request;
-    enum packet_response response;
+    packet_directive_t response;
 } ingestion_packet_t;
 
 /*

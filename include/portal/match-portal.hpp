@@ -5,13 +5,8 @@
 #include "exec/match-executor.hpp"
 #include "definitions.hpp"
 
-enum packet_request {
-    ACK = 1,
-    NAK = 2
-};
-
 typedef union {
-    enum packet_request request;
+    packet_directive_t request;
     match_t response;
 } match_packet_t;
 

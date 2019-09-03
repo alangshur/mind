@@ -2,7 +2,10 @@
 using namespace std;
 
 EngineMatchExecutor::EngineMatchExecutor(EngineContributionStore& contribution_store) 
-    : contribution_store(contribution_store) {}
+    : contribution_store(contribution_store) {
+    this->logger.log_message("EngineMatchExecutor", "Initializing match executor.");
+}
+
 EngineMatchExecutor::~EngineMatchExecutor() {}
 
 match_t EngineMatchExecutor::fetch_match() {
@@ -22,9 +25,10 @@ void EngineMatchExecutor::run() {
 
             // wait for refill
             unique_lock<mutex> lk(this->match_queue_mutex);
-            this->refill_cv.wait(lk, [this]() { 
-                return (this->match_queue.size() <= MATCH_QUEUE_REFILL_SIZE)
-                    || this->shutdown_flag;
+            this->refill_cv.wait(lk, [&, this]() { 
+                return ((this->match_queue.size() <= MATCH_QUEUE_REFILL_SIZE)
+                    && (this->contribution_store.get_contribution_count() 
+                    >= MIN_MATCH_CONTRIBUTION_COUNT)) || this->shutdown_flag; 
             });
             if (this->shutdown_flag) break;
 

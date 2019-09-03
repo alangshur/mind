@@ -3,7 +3,10 @@
 using namespace std;
 
 EngineIngestionPortal::EngineIngestionPortal(EngineIngestionExecutor& executor,
-    uint16_t port) : executor(executor), server(port) {}
+    uint16_t port) : executor(executor), server(port) {
+    this->logger.log_message("EngineIngestionPortal", "Initializing ingestion portal.");
+}
+
 EngineIngestionPortal::~EngineIngestionPortal() {}
 
 void EngineIngestionPortal::run() {

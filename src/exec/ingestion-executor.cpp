@@ -2,7 +2,10 @@
 using namespace std;
 
 EngineIngestionExecutor::EngineIngestionExecutor(EngineContributionStore& 
-    contribution_store) : contribution_store(contribution_store) {}
+    contribution_store) : contribution_store(contribution_store) {
+    this->logger.log_message("EngineIngestionExecutor", "Initializing ingestion executor.");
+}
+
 EngineIngestionExecutor::~EngineIngestionExecutor() {}
 
 void EngineIngestionExecutor::add_ingestion(ingestion_t& ingestion) {

@@ -15,6 +15,10 @@ typedef uint32_t cid;
 typedef float elo;
 typedef uint8_t node;
 typedef uint8_t distribution_rating;
+typedef enum {
+    ACK = 1,
+    NAK = 2
+} packet_directive_t;
 
 // define global shutdown operators
 extern EffSemaphore global_shutdown_sem;
