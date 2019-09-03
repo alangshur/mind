@@ -21,6 +21,8 @@ void EngineIngestionPortal::run() {
 
             // enqueue ingestion
             this->executor.add_ingestion(ingestion_req.request);
+            this->logger.log_message("EngineIngestionPortal", 
+                "Received ingestion request and added ingestion.");
 
             // write response
             ingestion_packet_t ingestion_res;

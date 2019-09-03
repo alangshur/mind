@@ -22,6 +22,8 @@ void EngineMatchPortal::run() {
 
             // fetch match
             match_t match = this->executor.fetch_match();
+            this->logger.log_message("EngineMatchPortal", 
+                "Received match request and fetched match.");
 
             // write response
             match_packet_t match_res;
