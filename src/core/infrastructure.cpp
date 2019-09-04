@@ -1,6 +1,5 @@
 #include <utility>
 #include <iostream>
-#include <algorithm>
 #include <cmath>
 #include "core/infrastructure.hpp"
 using namespace std;
