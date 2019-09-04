@@ -3,7 +3,7 @@
 
 #include "definitions.hpp"
 
-const float ELO_K_FACTOR = 20.0;
+const float ELO_K_FACTOR = 40.0;
 const float ELO_N_SCALE = 400.0;
 const float ELO_EXP_BASE = 10.0;
 

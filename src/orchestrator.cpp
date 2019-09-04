@@ -109,8 +109,25 @@ void EngineOrchestrator::shutdown_exec() {
     }
 }
 
+#include "util/iqr-scorer.hpp"
+
 int main(int argc, const char* argv[]) {
-    EngineOrchestrator orchestrator;
-    orchestrator.execute();
+
+    IQRScorer scorer;
+    scorer.add_sample(1);
+    scorer.add_sample(2);
+    scorer.add_sample(3);
+    scorer.add_sample(1);
+
+    scorer.print_quartile_set();
+
+    cout << endl << "Q1: " << scorer.get_q1() << endl << flush;
+    cout << "Q2: " << scorer.get_q2() << endl << flush;
+    cout << "Q3: " << scorer.get_q3() << endl << endl << flush;
+    cout << "IQR: " << scorer.get_iqr() << endl << flush;
+    cout << "Mean: " << scorer.get_mean() << endl << flush;
+
+    // EngineOrchestrator orchestrator;
+    // orchestrator.execute();
     return 0;
 }

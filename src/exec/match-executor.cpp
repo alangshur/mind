@@ -12,11 +12,11 @@ match_t EngineMatchExecutor::fetch_match() {
     this->match_queue_sem.wait();
 
     // fetch new match
-    std::unique_lock lk(this->match_queue_mutex);
+    unique_lock lk(this->match_queue_mutex);
     if (!this->match_queue.size()) return {0, 0};
     match_t match = this->match_queue.front();
     this->match_queue.pop();
-    this->refill_cv.notify_one();
+    if (this->match_queue.size() <= MATCH_QUEUE_REFILL_SIZE) this->refill_cv.notify_one();
     return match;
 }
 

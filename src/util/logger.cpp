@@ -4,10 +4,7 @@
 #include "util/logger.hpp"
 using namespace std;
 
-Logger::Logger(bool verbose = true) : verbose(verbose) {}
-
 void Logger::log_message(const string& module, const string& message) {
-    if (!verbose) return;
     cout 
         << "[LOG] "
         << module
@@ -17,7 +14,6 @@ void Logger::log_message(const string& module, const string& message) {
 }
 
 void Logger::log_error(const string& module, const string& error) {
-    if (!verbose) return;
     cout 
         << "[ERROR] "
         << module
