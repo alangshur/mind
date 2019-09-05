@@ -9,6 +9,7 @@ IQRScorer::IQRScorer() : sample_sum(0), sample_count(0) {
     this->median = { 0, false, 0, 0 };
     this->q3 = { 0, false, this->third_quartile_set.begin(), 
         this->third_quartile_set.end() };
+    srand(time(NULL));
 }
 
 void IQRScorer::add_even_quartile_it(quartile_t& quartile, 
@@ -316,17 +317,36 @@ double IQRScorer::get_iqr() { return this->get_q3() - this->get_q1(); }
 double IQRScorer::get_q1() { return (this->q1).value; }
 double IQRScorer::get_median() { return (this->median).value; }
 double IQRScorer::get_q3() { return (this->q3).value; }
-
+uint32_t IQRScorer::size() { return this->sample_count; }
 double IQRScorer::get_mean() {
+    if (!this->sample_count)
+        throw runtime_error("Cannot find sample to be removed");
     return double(this->sample_sum) / double(this->sample_count); 
 }
 
-bool IQRScorer::is_outlier() {
-    return false;
+outlier_t IQRScorer::is_outlier(double value) {
+    if (value > this->get_q3() + (OUTLIER_COEFF * this->get_iqr())) return Above;
+    else if (value < this->get_q1() - (OUTLIER_COEFF * this->get_iqr())) return Below;
+    else return No;
 }
 
 uint32_t IQRScorer::fetch_random_sample() {
-    return 0;
+    if (!this->sample_count)
+        throw runtime_error("Cannot find sample to be removed");
+
+    // account for non-composite median
+    if (!this->median.is_composite_quartile && 
+        !(rand() % this->sample_count)) return this->median.value_f;
+
+    // execute composite pipeline
+    else {
+        multiset<uint32_t>::iterator it;
+        uint32_t it_jump = rand() % (this->sample_count / 2);    
+        if (rand() % 2) it = begin(this->first_quartile_set);
+        else it = begin(this->third_quartile_set);
+        advance(it, it_jump);
+        return *it;
+    }
 }
 
 void IQRScorer::print_quartile_set() {

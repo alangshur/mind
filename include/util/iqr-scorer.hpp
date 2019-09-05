@@ -5,6 +5,14 @@
 #include <utility>
 #include <set>
 
+const float OUTLIER_COEFF = 1.5;
+
+typedef enum outlier_type {
+    No = 0,
+    Below = 1,
+    Above = 2,
+} outlier_t;
+
 typedef struct {
     double value;
     bool is_composite_quartile;
@@ -36,7 +44,8 @@ class IQRScorer {
         double get_median();
         double get_q3();
         double get_mean();
-        bool is_outlier();
+        uint32_t size();
+        outlier_t is_outlier(double value);
         uint32_t fetch_random_sample();
         void print_quartile_set();
 
