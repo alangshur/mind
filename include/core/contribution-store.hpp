@@ -1,5 +1,5 @@
-#ifndef INFRASTRUCTURE_H
-#define INFRASTRUCTURE_H
+#ifndef CONTRIBUTION_STORE_H
+#define CONTRIBUTION_STORE_H
 
 #include <mutex>
 #include <map>
@@ -45,15 +45,20 @@ class EngineContributionStore {
 
     private:    
         EngineEloStore& elo_store;
+        std::atomic<uint32_t> contribution_count;
+
         std::map<cid, std::atomic<contribution_t>> store;
         std::mutex store_mutex;
+
         IQRScorer elo_bucket_scorer;
         std::mutex elo_bucket_scorer_mutex;
+
         std::queue<cid> above_outlier_queue;
         std::mutex above_outlier_queue_mutex;
+
         std::queue<cid> below_outlier_queue;
         std::mutex below_outlier_queue_mutex;
-        std::atomic<uint32_t> contribution_count;
+
 };
 
 #endif

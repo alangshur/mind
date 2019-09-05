@@ -54,7 +54,7 @@ void EngineOrchestrator::shutdown_process() {
 
 void EngineOrchestrator::build_core() {
 
-    // build infrastructure core
+    // build core
     this->elo_store = new EngineEloStore();
     this->contribution_store = new EngineContributionStore(*(this->elo_store));
 }

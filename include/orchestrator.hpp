@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 #include "util/logger.hpp"
+#include "core/elo-store.hpp"
 #include "core/contribution-store.hpp"
 #include "exec/ingestion-executor.hpp"
 #include "exec/match-executor.hpp"
