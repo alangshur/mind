@@ -5,7 +5,7 @@
 #include <queue>
 #include "util/semaphore.hpp"
 #include "util/elo-scorer.hpp"
-#include "core/infrastructure.hpp"
+#include "core/contribution-store.hpp"
 #include "definitions.hpp"
 
 enum ingestion_type {

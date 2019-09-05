@@ -4,7 +4,7 @@
 #include <mutex>
 #include <queue>
 #include <condition_variable>
-#include "core/infrastructure.hpp"
+#include "core/contribution-store.hpp"
 #include "util/semaphore.hpp"
 #include "definitions.hpp"
 

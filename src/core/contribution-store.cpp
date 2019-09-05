@@ -1,44 +1,6 @@
-#include <utility>
-#include <iostream>
 #include <cmath>
-#include "core/infrastructure.hpp"
+#include "core/contribution-store.hpp"
 using namespace std;
-
-EngineEloStore::EngineEloStore() : store(ELO_STORE_SIZE) {}
-
-EngineEloStore::~EngineEloStore() {
-    for (size_t i = 0; i < store.size(); i++) {
-        (this->store)[i].free_list_memory();
-    }
-}
-
-c_node* EngineEloStore::add_contribution(cid contribution_id, elo init_rating) {
-    return (this->store)[(int) round(init_rating)].add_contribution(contribution_id);
-}
-
-c_node* EngineEloStore::update_contribution(cid contribution_id, c_node* position, 
-    elo old_rating, elo new_rating) {
-
-    // remove old contribution
-    (this->store)[(int) round(old_rating)]
-        .remove_contribution(position);
-
-    // update contribution
-    return (this->store)[(int) round(new_rating)]
-        .add_contribution(contribution_id);
-}
-
-void EngineEloStore::remove_contribution(elo rating, c_node* position) {
-    (this->store)[(int) round(rating)].remove_contribution(position);
-}
-
-uint32_t EngineEloStore::get_rating_list_size(elo rating) {
-    return (this->store)[(int) round(rating)].size();
-}
-
-cid EngineEloStore::cycle_front_contribution(uint32_t elo_bucket) {
-    return (this->store)[elo_bucket].cycle_front_contribution();
-}
 
 EngineContributionStore::EngineContributionStore(EngineEloStore& elo_store) : 
     elo_store(elo_store) {}
@@ -59,8 +21,8 @@ void EngineContributionStore::add_contribution(cid contribution_id) {
     store_lk.unlock();
 
     // update filled elo bucket list
-    unique_lock<mutex> elo_store_lk(this->filled_elo_buckets_mutex);
-    this->filled_elo_buckets.insert((int) round(contribution.rating));
+    unique_lock<mutex> elo_store_lk(this->elo_bucket_scorer_mutex);
+    this->elo_bucket_scorer.add_sample((uint32_t) round(contribution.rating));
 }
 
 void EngineContributionStore::update_contribution(cid contribution_id, elo new_rating) {
@@ -77,11 +39,22 @@ void EngineContributionStore::update_contribution(cid contribution_id, elo new_r
     (this->store)[contribution_id].store(contribution);
     store_lk.unlock();
 
-    // update filled elo bucket list
-    unique_lock<mutex> elo_store_lk(this->filled_elo_buckets_mutex);
-    this->filled_elo_buckets.insert((int) round(new_rating));
-    if (!this->elo_store.get_rating_list_size(old_rating)) {
-        this->filled_elo_buckets.erase((int) round(old_rating));
+    // update filled elo bucket scorer
+    unique_lock<mutex> elo_store_lk(this->elo_bucket_scorer_mutex);
+    this->elo_bucket_scorer.remove_sample((uint32_t) round(old_rating));
+    this->elo_bucket_scorer.add_sample((uint32_t) round(new_rating));
+
+    // queue outliers
+    outlier_t outlier_r = this->elo_bucket_scorer.is_outlier(new_rating);
+    if (outlier_r != No) {
+        if (outlier_r == Above) {
+            unique_lock<mutex> outlier_lk(this->above_outlier_queue_mutex);
+            this->above_outlier_queue.push(contribution_id);
+        }
+        else if (outlier_r == Below) {
+            unique_lock<mutex> outlier_lk(this->below_outlier_queue_mutex);
+            this->below_outlier_queue.push(contribution_id);
+        }
     }
 }
 
@@ -98,10 +71,8 @@ void EngineContributionStore::remove_contribution(cid contribution_id) {
     store_lk.unlock();
  
     // update filled elo bucket list
-    unique_lock<mutex> elo_store_lk(this->filled_elo_buckets_mutex);
-    if (!this->elo_store.get_rating_list_size(contribution.rating)) {
-        this->filled_elo_buckets.erase((int) round(contribution.rating));
-    }
+    unique_lock<mutex> elo_store_lk(this->elo_bucket_scorer_mutex);
+    this->elo_bucket_scorer.remove_sample((uint32_t) round(contribution.rating));
 }
 
 elo EngineContributionStore::fetch_contribution_elo(cid contribution_id) {
@@ -115,13 +86,9 @@ bool EngineContributionStore::verify_contribution(cid contribution_id) {
 }
 
 cid EngineContributionStore::attempt_fetch_match_item() {
-    unique_lock<mutex> lk(this->filled_elo_buckets_mutex);
-    int32_t it_jump = rand() % this->filled_elo_buckets.size();
-
-    // iterate to cid
-    auto it = begin(this->filled_elo_buckets);
-    advance(it, it_jump);
-    return this->elo_store.cycle_front_contribution(*it);
+    unique_lock<mutex> lk(this->elo_bucket_scorer_mutex);
+    uint32_t rand_bucket = this->elo_bucket_scorer.fetch_random_sample();
+    return this->elo_store.cycle_front_contribution(rand_bucket);
 }
 
 pair<cid, cid> EngineContributionStore::fetch_match_pair() {
@@ -142,4 +109,24 @@ pair<cid, cid> EngineContributionStore::fetch_match_pair() {
 
 uint32_t EngineContributionStore::get_contribution_count() {
     return this->contribution_count;
+}
+
+cid EngineContributionStore::dump_above_outlier_until() {
+    unique_lock<mutex> lk(this->above_outlier_queue_mutex);
+    if (this->above_outlier_queue.size()) {
+        cid contribution_id = this->above_outlier_queue.front();
+        this->above_outlier_queue.pop();
+        return contribution_id;
+    }
+    else return 0;
+}
+
+cid EngineContributionStore::dump_below_outlier_until() {
+    unique_lock<mutex> lk(this->below_outlier_queue_mutex);
+    if (this->below_outlier_queue.size()) {
+        cid contribution_id = this->below_outlier_queue.front();
+        this->below_outlier_queue.pop();
+        return contribution_id;
+    }
+    else return 0;
 }
