@@ -1,6 +1,7 @@
 #ifndef CONTROL_EXEC_H
 #define CONTROL_EXEC_H
 
+#include <atomic>
 #include <queue>
 #include <mutex>
 #include "core/contribution-store.hpp"
@@ -25,6 +26,7 @@ class EngineControlExecutor : private EngineExecutor {
         EngineContributionStore& contribution_store;
         std::queue<outlier_t> outlier_queue;
         std::mutex outlier_queue_mutex;
+        std::atomic<uint32_t> outlier_queue_size;
 };
  
 #endif
