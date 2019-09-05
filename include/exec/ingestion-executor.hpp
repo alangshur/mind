@@ -11,7 +11,8 @@
 enum ingestion_type {
     Contribution = 1,
     Update = 2,
-    Remove = 3
+    Remove = 3,
+    Empty = 4
 };
 
 typedef struct {

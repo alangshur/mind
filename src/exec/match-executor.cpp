@@ -9,11 +9,10 @@ EngineMatchExecutor::EngineMatchExecutor(EngineContributionStore& contribution_s
 EngineMatchExecutor::~EngineMatchExecutor() {}
 
 match_t EngineMatchExecutor::fetch_match() {
-    this->match_queue_sem.wait();
 
     // fetch new match
     unique_lock lk(this->match_queue_mutex);
-    if (!this->match_queue.size()) return {0, 0};
+    if (!this->match_queue.size()) return { Empty, 0, 0 };
     match_t match = this->match_queue.front();
     this->match_queue.pop();
     if (this->match_queue.size() <= MATCH_QUEUE_REFILL_SIZE) this->refill_cv.notify_one();
@@ -39,8 +38,7 @@ void EngineMatchExecutor::run() {
             this->logger.log_message("EngineMatchExecutor", "Beginning to refill match queue.");
             while (this->match_queue.size() < MATCH_QUEUE_REFILL_LIMIT) {
                 pair<cid, cid> match_pair = this->contribution_store.fetch_match_pair();
-                this->match_queue.push({ match_pair.first, match_pair.second });
-                this->match_queue_sem.post();
+                this->match_queue.push({ Valid, match_pair.first, match_pair.second });
             }   
         }
     }

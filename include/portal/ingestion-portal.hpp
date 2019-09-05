@@ -5,8 +5,9 @@
 #include "exec/ingestion-executor.hpp"
 #include "definitions.hpp"
 
+const uint32_t NUM_REQ_PACKETS = 5;
 typedef union {
-    ingestion_t request;
+    ingestion_t request[NUM_REQ_PACKETS];
     packet_directive_t response;
 } ingestion_packet_t;
 

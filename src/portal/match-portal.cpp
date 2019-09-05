@@ -12,7 +12,7 @@ void EngineMatchPortal::run() {
     try {
         while (true) {
 
-            // read new packet
+            // read new request
             this->server.accept_connection();
             if (this->shutdown_flag) break;
             match_packet_t match_req;
@@ -20,14 +20,22 @@ void EngineMatchPortal::run() {
             if (match_req.request != ACK) 
                 throw runtime_error("Invalid request");
 
-            // fetch match
-            match_t match = this->executor.fetch_match();
-            this->logger.log_message("EngineMatchPortal", 
-                "Received match request and fetched match.");
+            // fetch matches
+            match_packet_t match_res;
+            uint32_t match_count = 0;
+            for (size_t i = 0; i < NUM_RES_PACKETS; i++) {
+                match_t match = this->executor.fetch_match();
+                if (match.type != Empty) {
+                    match_res.response[i] = match;
+                    match_count++;
+                }
+                else match_res.response[i] = { Empty, 0, 0 };
+            }
 
             // write response
-            match_packet_t match_res;
-            match_res.response = match;
+            this->logger.log_message("EngineMatchPortal", 
+                "Received match request and fetched " + 
+                to_string(match_count) + " match(es).");
             this->server.write_packet(match_res);
             this->server.close_connection();
         }

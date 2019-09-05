@@ -12,7 +12,13 @@ const uint32_t MATCH_QUEUE_REFILL_SIZE = 5;
 const uint32_t MATCH_QUEUE_REFILL_LIMIT = 15;
 const uint32_t MIN_MATCH_CONTRIBUTION_COUNT = 5;
 
+enum match_type {
+    Valid = 1,
+    Empty = 2
+};
+
 typedef struct {
+    enum match_type type;
     cid contribution_id_a;
     cid contribution_id_b;
 } match_t;
@@ -33,7 +39,6 @@ class EngineMatchExecutor : private EngineExecutor {
 
     private:
         std::queue<match_t> match_queue;
-        EffSemaphore match_queue_sem;
         std::mutex match_queue_mutex;
         std::condition_variable refill_cv;
         EngineContributionStore& contribution_store;

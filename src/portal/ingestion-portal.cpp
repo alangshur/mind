@@ -13,16 +13,24 @@ void EngineIngestionPortal::run() {
     try {
         while (true) {
 
-            // read new packet
+            // read new request
             this->server.accept_connection();
             if (this->shutdown_flag) break;
             ingestion_packet_t ingestion_req;
             this->server.read_packet(ingestion_req);
 
-            // enqueue ingestion
-            this->executor.add_ingestion(ingestion_req.request);
-            this->logger.log_message("EngineIngestionPortal", 
-                "Received ingestion request and added ingestion.");
+            // enqueue ingestions
+            uint32_t ingestion_count = 0;
+            for (size_t i = 0; i < NUM_REQ_PACKETS; i++) {
+                if (ingestion_req.request[i].type != Empty) {
+                    this->executor.add_ingestion(ingestion_req.request[i]);
+                    ingestion_count++;
+                }
+                else break;
+            }
+            this->logger.log_message("EngineIngestionPortal", "Received "
+                "ingestion request and added " + to_string(ingestion_count) 
+                + " ingestion(s).");
 
             // write response
             ingestion_packet_t ingestion_res;
