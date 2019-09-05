@@ -7,6 +7,7 @@ EngineOrchestrator::~EngineOrchestrator() {
     // free portal pointers
     delete this->ingestion_portal;
     delete this->match_portal;
+    delete this->control_portal;
 
     // free exec pointers
     delete this->ingestion_exec;
@@ -91,6 +92,11 @@ void EngineOrchestrator::build_portal() {
     this->match_portal = new EngineMatchPortal(*(this->match_exec), MATCH_PORT);
     portal_threads.push_back(thread([&](EngineMatchPortal* portal) 
         { portal->run(); }, this->match_portal));
+    
+    // build control portal
+    this->control_portal = new EngineControlPortal(*(this->control_exec), CONTROL_PORT);
+    portal_threads.push_back(thread([&](EngineControlPortal* portal) 
+        { portal->run(); }, this->control_portal));
 }
 
 void EngineOrchestrator::shutdown_portal() {
@@ -98,6 +104,7 @@ void EngineOrchestrator::shutdown_portal() {
     // shutdown portals
     this->ingestion_portal->shutdown();
     this->match_portal->shutdown();
+    this->control_portal->shutdown();
 
     // join portals
     for (size_t i = 0; i < this->portal_threads.size(); i++) {
@@ -110,6 +117,7 @@ void EngineOrchestrator::shutdown_exec() {
     // shutdown executors
     this->ingestion_exec->shutdown();
     this->match_exec->shutdown();
+    this->control_exec->shutdown();
 
     // join executors
     for (size_t i = 0; i < this->exec_threads.size(); i++) {

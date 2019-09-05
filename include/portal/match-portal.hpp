@@ -5,10 +5,10 @@
 #include "exec/match-executor.hpp"
 #include "definitions.hpp"
 
-const uint32_t NUM_RES_PACKETS = 5;
+const uint32_t NUM_MATCH_RES_PACKETS = 5;
 typedef union {
     packet_directive_t request;
-    match_t response[5];
+    match_t response[NUM_MATCH_RES_PACKETS];
 } match_packet_t;
 
 /*

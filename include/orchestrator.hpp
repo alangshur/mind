@@ -11,6 +11,7 @@
 #include "exec/control-executor.hpp"
 #include "portal/ingestion-portal.hpp"
 #include "portal/match-portal.hpp"
+#include "portal/control-portal.hpp"
 #include "definitions.hpp"
 
 /*
@@ -51,6 +52,7 @@ class EngineOrchestrator {
         // portal pointers
         EngineIngestionPortal* ingestion_portal;
         EngineMatchPortal* match_portal;
+        EngineControlPortal* control_portal;
 
         // threads
         std::vector<std::thread> portal_threads;

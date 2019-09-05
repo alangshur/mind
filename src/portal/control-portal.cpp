@@ -39,7 +39,7 @@ void EngineControlPortal::run() {
             else {
                 
                 // build response
-                for (size_t i = 0; i < NUM_RES_PACKETS; i++) {
+                for (size_t i = 0; i < NUM_CONTROL_RES_PACKETS; i++) {
                     control_res.response.outliers[i] = 
                         this->executor.fetch_outlier();
                 }   

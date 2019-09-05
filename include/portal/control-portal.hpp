@@ -16,9 +16,9 @@ typedef struct {
     packet_directive_t directive;
 } control_request_t;
 
-const uint32_t NUM_RES_PACKETS = 5;
+const uint32_t NUM_CONTROL_RES_PACKETS = 5;
 typedef union {
-    outlier_t outliers[NUM_RES_PACKETS];
+    outlier_t outliers[NUM_CONTROL_RES_PACKETS];
     packet_directive_t directive;
 } control_response_t;
 
@@ -34,7 +34,8 @@ typedef union {
     back requested data (e.g. outlier contribution data).  
 */
 class EngineControlPortal : private EnginePortal {
-    EngineControlPortal(EngineControlExecutor& executor, uint16_t port);
+    public:
+        EngineControlPortal(EngineControlExecutor& executor, uint16_t port);
         virtual ~EngineControlPortal();
         virtual void run();
         virtual void shutdown();

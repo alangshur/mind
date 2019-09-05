@@ -21,7 +21,7 @@ void EngineIngestionPortal::run() {
 
             // enqueue ingestions
             uint32_t ingestion_count = 0;
-            for (size_t i = 0; i < NUM_REQ_PACKETS; i++) {
+            for (size_t i = 0; i < NUM_INGESTION_REQ_PACKETS; i++) {
                 if (ingestion_req.request[i].type != IEmpty) {
                     this->executor.add_ingestion(ingestion_req.request[i]);
                     ingestion_count++;
