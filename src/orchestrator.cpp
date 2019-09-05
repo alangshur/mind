@@ -11,6 +11,7 @@ EngineOrchestrator::~EngineOrchestrator() {
     // free exec pointers
     delete this->ingestion_exec;
     delete this->match_exec;
+    delete this->control_exec;
 
     // free core pointers
     delete this->elo_store;
@@ -54,8 +55,10 @@ void EngineOrchestrator::shutdown_process() {
 
 void EngineOrchestrator::build_core() {
 
-    // build core
+    // build elo store 
     this->elo_store = new EngineEloStore();
+
+    // build contribution store
     this->contribution_store = new EngineContributionStore(*(this->elo_store));
 }
 
@@ -70,6 +73,11 @@ void EngineOrchestrator::build_exec() {
     this->match_exec = new EngineMatchExecutor(*(this->contribution_store));
     exec_threads.push_back(thread([&](EngineMatchExecutor* exec)
         { exec->run(); }, this->match_exec));
+
+    // build control executor
+    this->control_exec = new EngineControlExecutor(*(this->contribution_store));
+    exec_threads.push_back(thread([&](EngineControlExecutor* exec)
+        { exec->run(); }, this->control_exec));
 }
 
 void EngineOrchestrator::build_portal() {
@@ -109,11 +117,8 @@ void EngineOrchestrator::shutdown_exec() {
     }
 }
 
-#include "util/iqr-scorer.hpp"
-#include <map>
-
 int main(int argc, const char* argv[]) {
-    // EngineOrchestrator orchestrator;
-    // orchestrator.execute();
+    EngineOrchestrator orchestrator;
+    orchestrator.execute();
     return 0;
 }

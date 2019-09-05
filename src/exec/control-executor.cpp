@@ -2,7 +2,9 @@
 using namespace std;
  
 EngineControlExecutor::EngineControlExecutor(EngineContributionStore& 
-    contribution_store) : contribution_store(contribution_store) {}
+    contribution_store) : contribution_store(contribution_store) {
+    this->logger.log_message("EngineControlExecutor", "Initializing control executor.");
+}
 
 EngineControlExecutor::~EngineControlExecutor() {}
 

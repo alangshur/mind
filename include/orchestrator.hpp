@@ -8,6 +8,7 @@
 #include "core/contribution-store.hpp"
 #include "exec/ingestion-executor.hpp"
 #include "exec/match-executor.hpp"
+#include "exec/control-executor.hpp"
 #include "portal/ingestion-portal.hpp"
 #include "portal/match-portal.hpp"
 #include "definitions.hpp"
@@ -45,6 +46,7 @@ class EngineOrchestrator {
         // exec pointers
         EngineIngestionExecutor* ingestion_exec;
         EngineMatchExecutor* match_exec;
+        EngineControlExecutor* control_exec;
 
         // portal pointers
         EngineIngestionPortal* ingestion_portal;
