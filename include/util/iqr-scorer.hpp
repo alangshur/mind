@@ -28,6 +28,7 @@ typedef struct {
 */
 class IQRScorer {
     public:
+        IQRScorer();
         void add_sample(uint32_t sample);
         void remove_sample(uint32_t sample);
         double get_iqr();

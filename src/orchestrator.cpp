@@ -120,20 +120,20 @@ int main(int argc, const char* argv[]) {
     scorer.add_sample(3);
     scorer.add_sample(1);
     scorer.add_sample(4);
-    scorer.add_sample(145);
-    scorer.add_sample(1);
-    scorer.add_sample(3);
-    scorer.add_sample(0);
-    scorer.add_sample(0);
-    scorer.add_sample(0);
+    scorer.remove_sample(4);
+    scorer.remove_sample(1);
+    scorer.remove_sample(2);
+    scorer.remove_sample(1);
+    scorer.remove_sample(3);
+    scorer.remove_sample(1);
 
     scorer.print_quartile_set();
 
-    cout << endl << "Q1: " << scorer.get_q1() << endl << flush;
-    cout << "Q2: " << scorer.get_median() << endl << flush;
-    cout << "Q3: " << scorer.get_q3() << endl << endl << flush;
-    cout << "IQR: " << scorer.get_iqr() << endl << flush;
-    cout << "Mean: " << scorer.get_mean() << endl << flush;
+    // cout << endl << "Q1: " << scorer.get_q1() << endl << flush;
+    // cout << "Q2: " << scorer.get_median() << endl << flush;
+    // cout << "Q3: " << scorer.get_q3() << endl << endl << flush;
+    // cout << "IQR: " << scorer.get_iqr() << endl << flush;
+    // cout << "Mean: " << scorer.get_mean() << endl << flush;
 
     // EngineOrchestrator orchestrator;
     // orchestrator.execute();
