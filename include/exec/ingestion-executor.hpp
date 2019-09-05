@@ -12,7 +12,7 @@ enum ingestion_type {
     Contribution = 1,
     Update = 2,
     Remove = 3,
-    Empty = 4
+    IEmpty = 4
 };
 
 typedef struct {
@@ -51,9 +51,9 @@ class EngineIngestionExecutor : private EngineExecutor {
     public:
         EngineIngestionExecutor(EngineContributionStore& contribution_store);
         virtual ~EngineIngestionExecutor();
-        void add_ingestion(ingestion_t& ingestion);
         virtual void run();
         virtual void shutdown();
+        void add_ingestion(ingestion_t& ingestion);
 
     private:
         void handle_contribution(ingestion_contribution_t& contribution);

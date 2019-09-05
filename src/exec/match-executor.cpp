@@ -8,17 +8,6 @@ EngineMatchExecutor::EngineMatchExecutor(EngineContributionStore& contribution_s
 
 EngineMatchExecutor::~EngineMatchExecutor() {}
 
-match_t EngineMatchExecutor::fetch_match() {
-
-    // fetch new match
-    unique_lock lk(this->match_queue_mutex);
-    if (!this->match_queue.size()) return { Empty, 0, 0 };
-    match_t match = this->match_queue.front();
-    this->match_queue.pop();
-    if (this->match_queue.size() <= MATCH_QUEUE_REFILL_SIZE) this->refill_cv.notify_one();
-    return match;
-}
-
 void EngineMatchExecutor::run() {
     try {
         while (true) {  
@@ -62,4 +51,16 @@ void EngineMatchExecutor::shutdown() {
     this->wait_shutdown();
     this->logger.log_message("EngineMatchExecutor", "Successfully shutdown "
         "match executor.");
+}
+
+
+match_t EngineMatchExecutor::fetch_match() {
+
+    // fetch new match
+    unique_lock lk(this->match_queue_mutex);
+    if (!this->match_queue.size()) return { MEmpty, 0, 0 };
+    match_t match = this->match_queue.front();
+    this->match_queue.pop();
+    if (this->match_queue.size() <= MATCH_QUEUE_REFILL_SIZE) this->refill_cv.notify_one();
+    return match;
 }

@@ -43,17 +43,24 @@ void EngineContributionStore::update_contribution(cid contribution_id, elo new_r
     unique_lock<mutex> elo_store_lk(this->elo_bucket_scorer_mutex);
     this->elo_bucket_scorer.remove_sample((uint32_t) round(old_rating));
     this->elo_bucket_scorer.add_sample((uint32_t) round(new_rating));
+    enum outlier_type outlier_r = this->elo_bucket_scorer.is_outlier(new_rating);
+    elo_store_lk.unlock();
 
     // queue outliers
-    outlier_t outlier_r = this->elo_bucket_scorer.is_outlier(new_rating);
     if (outlier_r != No) {
         if (outlier_r == Above) {
             unique_lock<mutex> outlier_lk(this->above_outlier_queue_mutex);
             this->above_outlier_queue.push(contribution_id);
+            outlier_lk.unlock();
+            this->above_outliers_count++;
+            this->outlier_queue_sem.post();
         }
         else if (outlier_r == Below) {
             unique_lock<mutex> outlier_lk(this->below_outlier_queue_mutex);
             this->below_outlier_queue.push(contribution_id);
+            outlier_lk.unlock();
+            this->above_outliers_count++;
+            this->outlier_queue_sem.post();
         }
     }
 }
@@ -129,4 +136,38 @@ cid EngineContributionStore::dump_below_outlier_until() {
         return contribution_id;
     }
     else return 0;
+}
+
+outlier_t EngineContributionStore::get_above_outlier() {
+    this->above_outliers_count--;
+    unique_lock<mutex> lk(this->above_outlier_queue_mutex);
+    cid contribution_id = this->above_outlier_queue.front();
+    this->above_outlier_queue.pop();
+    return { Above, contribution_id };
+}
+
+outlier_t EngineContributionStore::get_below_outlier() {
+    this->below_outliers_count--;
+    unique_lock<mutex> lk(this->below_outlier_queue_mutex);
+    cid contribution_id = this->below_outlier_queue.front();
+    this->below_outlier_queue.pop();
+    return { Below, contribution_id };
+}
+
+outlier_t EngineContributionStore::fetch_outlier() {
+    if (this->above_outliers_count > this->below_outliers_count) 
+        return this->get_above_outlier();
+    else if (this->below_outliers_count > this->above_outliers_count) 
+        return this->get_below_outlier();
+    else if (this->above_outliers_count > 0)   
+        return this->get_above_outlier();
+    else return get_below_outlier();
+}
+
+void EngineContributionStore::wait_for_outlier() {
+    this->outlier_queue_sem.wait();
+}
+
+void EngineContributionStore::trigger_outlier_wait() {
+    this->outlier_queue_sem.post();
 }

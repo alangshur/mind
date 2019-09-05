@@ -14,7 +14,7 @@ const uint32_t MIN_MATCH_CONTRIBUTION_COUNT = 5;
 
 enum match_type {
     Valid = 1,
-    Empty = 2
+    MEmpty = 2
 };
 
 typedef struct {
@@ -24,18 +24,19 @@ typedef struct {
 } match_t;
 
 /*
-    The EngineMatchExecutor class maintains a
-    dynamically-updated queue of matches based 
-    on the currently stored contribution IDs and 
-    their ELO ratings. 
+    The EngineMatchExecutor class pieces together the entire 
+    match pipeline for the engine algorithm. It fetches match 
+    data from the core infrastructure and intelligently prepares
+    this data in a concurrent queue structure for output by the 
+    match portal.
 */
 class EngineMatchExecutor : private EngineExecutor {
     public:
         EngineMatchExecutor(EngineContributionStore& contribution_store);
         virtual ~EngineMatchExecutor();
-        match_t fetch_match();
         virtual void run();
         virtual void shutdown();
+        match_t fetch_match();
 
     private:
         std::queue<match_t> match_queue;

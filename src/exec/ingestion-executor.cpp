@@ -8,12 +8,6 @@ EngineIngestionExecutor::EngineIngestionExecutor(EngineContributionStore&
 
 EngineIngestionExecutor::~EngineIngestionExecutor() {}
 
-void EngineIngestionExecutor::add_ingestion(ingestion_t& ingestion) {
-    unique_lock<mutex> lk(this->ingestion_queue_mutex);
-    this->ingestion_queue.push(ingestion);
-    this->ingestion_queue_sem.post();
-}
-
 void EngineIngestionExecutor::run() {    
     try {
         while (true) {
@@ -73,6 +67,12 @@ void EngineIngestionExecutor::shutdown() {
     this->wait_shutdown();
     this->logger.log_message("EngineIngestionExecutor", "Successfully shutdown "
         "ingestion executor.");
+}
+
+void EngineIngestionExecutor::add_ingestion(ingestion_t& ingestion) {
+    unique_lock<mutex> lk(this->ingestion_queue_mutex);
+    this->ingestion_queue.push(ingestion);
+    this->ingestion_queue_sem.post();
 }
 
 void EngineIngestionExecutor::handle_contribution(ingestion_contribution_t& contribution) {

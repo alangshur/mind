@@ -12,146 +12,6 @@ IQRScorer::IQRScorer() : sample_sum(0), sample_count(0) {
     srand(time(NULL));
 }
 
-void IQRScorer::add_even_quartile_it(quartile_t& quartile, 
-    multiset<uint32_t>& quartile_set, bool less_than_quartile) {
-
-    // handle quartile-sample placement
-    if (less_than_quartile) {
-        quartile = {
-            double(*prev(quartile.it_f) + *(quartile.it_f)) / 2.0,
-            true,
-            prev(quartile.it_f),
-            quartile.it_f
-        };
-    }
-    else {
-        quartile = {
-            double(*(quartile.it_f) + *next(quartile.it_f)) / 2.0,
-            true,
-            quartile.it_f,
-            next(quartile.it_f)
-        };
-    }
-}
-
-void IQRScorer::add_odd_quartile_it(quartile_t& quartile, 
-    multiset<uint32_t>& quartile_set, bool less_than_quartile) {
-
-    // handle quartile-sample placement
-    if (less_than_quartile) {
-        quartile = {
-            double(*(quartile.it_f)),
-            false,
-            quartile.it_f,
-            quartile_set.end()
-        };
-    }
-    else {
-        quartile = {
-            double(*next(quartile.it_f)),
-            false,
-            next(quartile.it_f),
-            quartile_set.end()
-        };
-    }
-}
-
-void IQRScorer::add_quartile(uint32_t sample, quartile_t& quartile,
-    multiset<uint32_t>& quartile_set) {
-    quartile_set.insert(sample);
-
-    // update specified set quartile 
-    if (quartile_set.size() % 2) {
-        if (double(sample) >= *(quartile.it_f)) 
-            this->add_odd_quartile_it(quartile, quartile_set, false);
-        else this->add_odd_quartile_it(quartile, quartile_set, true);
-    }
-    else {
-        if (double(sample) >= *(quartile.it_f)) 
-            this->add_even_quartile_it(quartile, quartile_set, false);
-        else this->add_even_quartile_it(quartile, quartile_set, true);
-    }
-}
-
-void IQRScorer::remove_even_quartile_it(quartile_t& quartile, 
-    multiset<uint32_t>& quartile_set, bool less_than_quartile,
-    bool is_first_it) {
-
-    // handle quartile-sample placement
-    if (is_first_it) {
-        quartile = {
-            double(*prev(quartile.it_f) + *next(quartile.it_f)) / 2.0,
-            true,
-            prev(quartile.it_f),
-            next(quartile.it_f)
-        };
-    }
-    else if (less_than_quartile) {
-        quartile = {
-            double(*(quartile.it_f) + *next(quartile.it_f)) / 2.0,
-            true,
-            quartile.it_f,
-            next(quartile.it_f)
-        };
-    }
-    else {
-        quartile = {
-            double(*prev(quartile.it_f) + *(quartile.it_f)) / 2.0,
-            true,
-            prev(quartile.it_f),
-            quartile.it_f
-        };
-    }
-}
-
-void IQRScorer::remove_odd_quartile_it(quartile_t& quartile, 
-    multiset<uint32_t>& quartile_set, bool less_than_quartile,
-    bool is_first_it) {
-
-    // handle quartile-sample placement
-    if (is_first_it || less_than_quartile) {
-        quartile = {
-            double(*(quartile.it_s)),
-            false,
-            quartile.it_s,
-            quartile_set.end()
-        };
-    }
-    else {
-        quartile = {
-            double(*(quartile.it_f)),
-            false,
-            quartile.it_f,
-            quartile_set.end()
-        };
-    }
-}
-
-void IQRScorer::remove_quartile(uint32_t sample, quartile_t& quartile,
-    multiset<uint32_t>& quartile_set) {
-
-    // find sample iterator
-    auto it = quartile_set.find(sample);
-    if (it == quartile_set.end()) 
-        throw runtime_error("Cannot find sample to be removed");
-    bool is_first_it = it == quartile.it_f;
-
-    // update specified set quartile 
-    if ((quartile_set.size() - 1) % 2) {
-        if (double(sample) >= *(quartile.it_f)) 
-            this->remove_odd_quartile_it(quartile, quartile_set, false, is_first_it);
-        else this->remove_odd_quartile_it(quartile, quartile_set, true, is_first_it);
-    }
-    else {
-        if (double(sample) >= *(quartile.it_f)) 
-            this->remove_even_quartile_it(quartile, quartile_set, false, is_first_it);
-        else this->remove_even_quartile_it(quartile, quartile_set, true, is_first_it);
-    }
-
-    // erase sample
-    quartile_set.erase(it);
-}
-
 void IQRScorer::add_sample(uint32_t sample) {
 
     // initiate scorer
@@ -324,7 +184,7 @@ double IQRScorer::get_mean() {
     return double(this->sample_sum) / double(this->sample_count); 
 }
 
-outlier_t IQRScorer::is_outlier(double value) {
+enum outlier_type IQRScorer::is_outlier(double value) {
     if (value > this->get_q3() + (OUTLIER_COEFF * this->get_iqr())) return Above;
     else if (value < this->get_q1() - (OUTLIER_COEFF * this->get_iqr())) return Below;
     else return No;
@@ -372,3 +232,143 @@ void IQRScorer::print_quartile_set() {
         cout << " - " << *curr_it++;
     cout << endl << flush;
 }   
+
+void IQRScorer::add_even_quartile_it(quartile_t& quartile, 
+    multiset<uint32_t>& quartile_set, bool less_than_quartile) {
+
+    // handle quartile-sample placement
+    if (less_than_quartile) {
+        quartile = {
+            double(*prev(quartile.it_f) + *(quartile.it_f)) / 2.0,
+            true,
+            prev(quartile.it_f),
+            quartile.it_f
+        };
+    }
+    else {
+        quartile = {
+            double(*(quartile.it_f) + *next(quartile.it_f)) / 2.0,
+            true,
+            quartile.it_f,
+            next(quartile.it_f)
+        };
+    }
+}
+
+void IQRScorer::add_odd_quartile_it(quartile_t& quartile, 
+    multiset<uint32_t>& quartile_set, bool less_than_quartile) {
+
+    // handle quartile-sample placement
+    if (less_than_quartile) {
+        quartile = {
+            double(*(quartile.it_f)),
+            false,
+            quartile.it_f,
+            quartile_set.end()
+        };
+    }
+    else {
+        quartile = {
+            double(*next(quartile.it_f)),
+            false,
+            next(quartile.it_f),
+            quartile_set.end()
+        };
+    }
+}
+
+void IQRScorer::add_quartile(uint32_t sample, quartile_t& quartile,
+    multiset<uint32_t>& quartile_set) {
+    quartile_set.insert(sample);
+
+    // update specified set quartile 
+    if (quartile_set.size() % 2) {
+        if (double(sample) >= *(quartile.it_f)) 
+            this->add_odd_quartile_it(quartile, quartile_set, false);
+        else this->add_odd_quartile_it(quartile, quartile_set, true);
+    }
+    else {
+        if (double(sample) >= *(quartile.it_f)) 
+            this->add_even_quartile_it(quartile, quartile_set, false);
+        else this->add_even_quartile_it(quartile, quartile_set, true);
+    }
+}
+
+void IQRScorer::remove_even_quartile_it(quartile_t& quartile, 
+    multiset<uint32_t>& quartile_set, bool less_than_quartile,
+    bool is_first_it) {
+
+    // handle quartile-sample placement
+    if (is_first_it) {
+        quartile = {
+            double(*prev(quartile.it_f) + *next(quartile.it_f)) / 2.0,
+            true,
+            prev(quartile.it_f),
+            next(quartile.it_f)
+        };
+    }
+    else if (less_than_quartile) {
+        quartile = {
+            double(*(quartile.it_f) + *next(quartile.it_f)) / 2.0,
+            true,
+            quartile.it_f,
+            next(quartile.it_f)
+        };
+    }
+    else {
+        quartile = {
+            double(*prev(quartile.it_f) + *(quartile.it_f)) / 2.0,
+            true,
+            prev(quartile.it_f),
+            quartile.it_f
+        };
+    }
+}
+
+void IQRScorer::remove_odd_quartile_it(quartile_t& quartile, 
+    multiset<uint32_t>& quartile_set, bool less_than_quartile,
+    bool is_first_it) {
+
+    // handle quartile-sample placement
+    if (is_first_it || less_than_quartile) {
+        quartile = {
+            double(*(quartile.it_s)),
+            false,
+            quartile.it_s,
+            quartile_set.end()
+        };
+    }
+    else {
+        quartile = {
+            double(*(quartile.it_f)),
+            false,
+            quartile.it_f,
+            quartile_set.end()
+        };
+    }
+}
+
+void IQRScorer::remove_quartile(uint32_t sample, quartile_t& quartile,
+    multiset<uint32_t>& quartile_set) {
+
+    // find sample iterator
+    auto it = quartile_set.find(sample);
+    if (it == quartile_set.end()) 
+        throw runtime_error("Cannot find sample to be removed");
+    bool is_first_it = it == quartile.it_f;
+
+    // update specified set quartile 
+    if ((quartile_set.size() - 1) % 2) {
+        if (double(sample) >= *(quartile.it_f)) 
+            this->remove_odd_quartile_it(quartile, quartile_set, false, is_first_it);
+        else this->remove_odd_quartile_it(quartile, quartile_set, true, is_first_it);
+    }
+    else {
+        if (double(sample) >= *(quartile.it_f)) 
+            this->remove_even_quartile_it(quartile, quartile_set, false, is_first_it);
+        else this->remove_even_quartile_it(quartile, quartile_set, true, is_first_it);
+    }
+
+    // erase sample
+    quartile_set.erase(it);
+}

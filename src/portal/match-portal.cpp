@@ -25,11 +25,8 @@ void EngineMatchPortal::run() {
             uint32_t match_count = 0;
             for (size_t i = 0; i < NUM_RES_PACKETS; i++) {
                 match_t match = this->executor.fetch_match();
-                if (match.type != Empty) {
-                    match_res.response[i] = match;
-                    match_count++;
-                }
-                else match_res.response[i] = { Empty, 0, 0 };
+                if (match.type != MEmpty) match_count++;
+                match_res.response[i] = match;
             }
 
             // write response

@@ -22,6 +22,11 @@ typedef struct {
     c_node* position = nullptr;
 } contribution_t;
 
+typedef struct {
+    outlier_type type;
+    cid contribution_id;
+} outlier_t;
+
 /*
     The EngineContributionStore class is a red-black-tree data
     structure mounted on top of the ELO store described above.
@@ -32,20 +37,29 @@ typedef struct {
 class EngineContributionStore {
     public:
         EngineContributionStore(EngineEloStore& elo_store);
+
         void add_contribution(cid contribution_id);
         void update_contribution(cid contribution_id, elo new_rating);
         void remove_contribution(cid contribution_id);
         elo fetch_contribution_elo(cid contribution_id);
         bool verify_contribution(cid contribution_id);
+        uint32_t get_contribution_count();
+
         cid attempt_fetch_match_item();
         std::pair<cid, cid> fetch_match_pair();
-        uint32_t get_contribution_count();
+
         cid dump_above_outlier_until();
         cid dump_below_outlier_until();
+        outlier_t get_above_outlier();
+        outlier_t get_below_outlier();
+        outlier_t fetch_outlier();
+        void wait_for_outlier();
+        void trigger_outlier_wait();
 
     private:    
         EngineEloStore& elo_store;
         std::atomic<uint32_t> contribution_count;
+        EffSemaphore outlier_queue_sem;
 
         std::map<cid, std::atomic<contribution_t>> store;
         std::mutex store_mutex;
@@ -53,12 +67,13 @@ class EngineContributionStore {
         IQRScorer elo_bucket_scorer;
         std::mutex elo_bucket_scorer_mutex;
 
+        std::atomic<uint32_t> above_outliers_count;
         std::queue<cid> above_outlier_queue;
         std::mutex above_outlier_queue_mutex;
 
+        std::atomic<uint32_t> below_outliers_count;
         std::queue<cid> below_outlier_queue;
         std::mutex below_outlier_queue_mutex;
-
 };
 
 #endif
