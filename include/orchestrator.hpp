@@ -21,7 +21,7 @@
     as assigning them to threads and monitoring these 
     child threads.
 */
-class EngineOrchestrator {
+class EngineOrchestrator : protected ShutdownThread {
     public:
         ~EngineOrchestrator();
         void execute();

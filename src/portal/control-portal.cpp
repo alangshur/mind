@@ -35,14 +35,21 @@ void EngineControlPortal::run() {
                 
                 // build response
                 control_res.response.directive = ACK;
+                this->logger.log_message("EngineControlPortal", "Received "
+                "and confirmed alive request.");
             } 
             else {
                 
                 // build response
+                uint32_t outlier_count = 0;
                 for (size_t i = 0; i < NUM_CONTROL_RES_PACKETS; i++) {
-                    control_res.response.outliers[i] = 
-                        this->executor.fetch_outlier();
+                    outlier_t outlier = this->executor.fetch_outlier();
+                    if (outlier.type != No) outlier_count++;
+                    control_res.response.outliers[i] = outlier;
                 }   
+                this->logger.log_message("EngineControlPortal", "Received "
+                "outlier request and fetched " + to_string(outlier_count) 
+                + " outlier(s).");
             }
 
             // write response
@@ -52,7 +59,7 @@ void EngineControlPortal::run() {
     }
     catch(exception& e) {
         this->server.force_close_connection();
-        if (!this->shutdown_in_progress()) {
+        if (!this->global_shutdown_in_progress()) {
             this->logger.log_error("EngineControlPortal", "Fatal error: " 
                 + string(e.what()) + ".");
             this->report_fatal_error();

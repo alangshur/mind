@@ -15,11 +15,12 @@ void EngineMatchExecutor::run() {
             // wait for refill
             unique_lock<mutex> lk(this->match_queue_mutex);
             this->refill_cv.wait(lk, [&, this]() { 
-                if (this->contribution_store.get_contribution_count() < MIN_MATCH_CONTRIBUTION_COUNT) {
+                if (this->shutdown_flag) return true;
+                else if (this->contribution_store.get_contribution_count() < MIN_MATCH_CONTRIBUTION_COUNT) {
                     this->logger.log_message("EngineMatchExecutor", "Contribution count too small for matches.");
                     return false;
                 }
-                return (this->match_queue.size() <= MATCH_QUEUE_REFILL_SIZE) || this->shutdown_flag; 
+                else return (this->match_queue.size() <= MATCH_QUEUE_REFILL_SIZE);
             });
             if (this->shutdown_flag) break;
 
@@ -32,7 +33,7 @@ void EngineMatchExecutor::run() {
         }
     }
     catch(exception& e) {
-        if (!this->shutdown_in_progress()) {
+        if (!this->global_shutdown_in_progress()) {
             this->logger.log_error("EngineMatchExecutor", "Fatal error: " + string(e.what()) + ".");
             this->report_fatal_error();
         }

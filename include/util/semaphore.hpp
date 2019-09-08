@@ -11,12 +11,12 @@
 */
 class BaseSemaphore {
     public:
-        BaseSemaphore(uint32_t count);
+        BaseSemaphore(int32_t count);
         void post();
         void wait();
 
     private:
-        uint32_t m_count;
+        int32_t m_count;
         std::mutex m_mutex;
         std::condition_variable m_cv;
 };
@@ -29,12 +29,12 @@ class BaseSemaphore {
 class EffSemaphore {
     public:
         EffSemaphore();
-        EffSemaphore(uint32_t count);
+        EffSemaphore(int32_t count);
         void post();
         void wait();
 
     private:
-        std::atomic<uint32_t> m_count;
+        std::atomic<int32_t> m_count;
         BaseSemaphore m_semaphore;
 };
 

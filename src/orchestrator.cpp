@@ -45,7 +45,7 @@ void EngineOrchestrator::launch_process() {
 
 void EngineOrchestrator::wait_process_shutdown() {
     this->logger.log_message("EngineOrchestrator", "Waiting for process shutdown.");  
-    global_shutdown_sem.wait();
+    this->global_shutdown_sem.wait();
 }
 
 void EngineOrchestrator::shutdown_process() {
@@ -125,8 +125,24 @@ void EngineOrchestrator::shutdown_exec() {
     }
 }
 
+#include "util/tcp-client.hpp"
+
 int main(int argc, const char* argv[]) {
     EngineOrchestrator orchestrator;
+
+    thread t([&]() {
+        sleep(1);
+        TCPClient<control_packet_t> client;
+        control_packet_t packet;
+        packet.request.type = Shutdown;
+        packet.request.directive = ACK;
+        client.send_connection("127.0.0.1", CONTROL_PORT);
+        client.write_packet(packet);
+        client.close_connection();
+    });
+
     orchestrator.execute();
+
+    t.join();
     return 0;
 }

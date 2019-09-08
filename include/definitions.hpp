@@ -21,9 +21,17 @@ typedef enum {
     NAK = 2
 } packet_directive_t;
 
-// define global shutdown operators
-extern EffSemaphore global_shutdown_sem;
-extern std::atomic<bool> global_shutdown_flag;
+/*
+    The ShutdownThread class is a simple parent
+    class used to specify simple static shutdown
+    constructs that will be shared by the engine
+    orchestrator and all the engine thread classes.
+*/
+class ShutdownThread {
+    public:
+        static EffSemaphore global_shutdown_sem;
+        static std::atomic<bool> global_shutdown_flag;
+};
 
 /*
     The EngineThread class is a simple parent
@@ -31,13 +39,13 @@ extern std::atomic<bool> global_shutdown_flag;
     individually threaded classes (such as portal
     and exec classes).
 */
-class EngineThread {        
+class EngineThread : protected ShutdownThread {        
     public:
         EngineThread();
 
     protected: 
         void report_fatal_error();
-        bool shutdown_in_progress();
+        bool global_shutdown_in_progress();
         void notify_shutdown();
         void wait_shutdown();
         virtual void run() = 0;

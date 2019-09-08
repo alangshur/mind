@@ -39,7 +39,7 @@ void EngineMatchPortal::run() {
     }
     catch(exception& e) {
         this->server.force_close_connection();
-        if (!this->shutdown_in_progress()) {
+        if (!this->global_shutdown_in_progress()) {
             this->logger.log_error("EngineMatchPortal", "Fatal error: " 
                 + string(e.what()) + ".");
             this->report_fatal_error();

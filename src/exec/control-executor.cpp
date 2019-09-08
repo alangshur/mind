@@ -22,7 +22,7 @@ void EngineControlExecutor::run() {
         }
     }
     catch(exception& e) {
-        if (!this->shutdown_in_progress()) {
+        if (!this->global_shutdown_in_progress()) {
             this->logger.log_error("EngineControlExecutor", "Fatal error: " 
                 + string(e.what()) + ".");
             this->report_fatal_error();
