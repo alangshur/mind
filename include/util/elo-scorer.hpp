@@ -1,7 +1,7 @@
 #ifndef ELO_SCORER_H
 #define ELO_SCORER_H
 
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 const float ELO_K_FACTOR = 40.0;
 const float ELO_N_SCALE = 400.0;

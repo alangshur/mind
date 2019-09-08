@@ -14,7 +14,6 @@ const uint16_t CONTROL_PORT = 9002;
 // define global types
 typedef uint32_t cid;
 typedef float elo;
-typedef uint8_t node;
 typedef uint8_t distribution_rating;
 typedef enum {
     ACK = 1,
@@ -25,7 +24,7 @@ typedef enum {
     The ShutdownThread class is a simple parent
     class used to specify simple static shutdown
     constructs that will be shared by the engine
-    orchestrator and all the engine thread classes.
+    worker and all the engine thread classes.
 */
 class ShutdownThread {
     public:

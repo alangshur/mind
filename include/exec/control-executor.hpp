@@ -5,7 +5,7 @@
 #include <queue>
 #include <mutex>
 #include "core/contribution-store.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 /*
     The EngineControlExecutor class pieces together the entire 

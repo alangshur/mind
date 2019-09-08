@@ -2,7 +2,7 @@
 #define RATING_LIST_H
 
 #include <mutex>
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 typedef struct c_node {
     cid id;

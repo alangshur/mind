@@ -3,7 +3,7 @@
 
 #include "exec/control-executor.hpp"
 #include "util/tcp-server.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 enum control_type {
     Shutdown = 1,

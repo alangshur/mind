@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "util/rating-list.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 const uint32_t ELO_STORE_SIZE = 10000;
 

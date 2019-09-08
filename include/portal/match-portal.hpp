@@ -3,7 +3,7 @@
 
 #include "util/tcp-server.hpp"
 #include "exec/match-executor.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 const uint32_t NUM_MATCH_RES_PACKETS = 5;
 typedef union {

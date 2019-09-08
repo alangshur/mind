@@ -1,5 +1,5 @@
-#ifndef ORCHESTRATOR_H
-#define ORCHESTRATOR_H
+#ifndef WORKER_H
+#define WORKER_H
 
 #include <thread>
 #include <vector>
@@ -12,18 +12,18 @@
 #include "portal/ingestion-portal.hpp"
 #include "portal/match-portal.hpp"
 #include "portal/control-portal.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 /*
-    The EngineOrchestrator class is the central 
-    orchestration unit for a single node. It manages
+    The EngineWorker class is the central 
+    orchestration unit for a single worker process. It manages
     the creation of all the individual modules, as well
     as assigning them to threads and monitoring these 
     child threads.
 */
-class EngineOrchestrator : protected ShutdownThread {
+class EngineWorker : protected ShutdownThread {
     public:
-        ~EngineOrchestrator();
+        ~EngineWorker();
         void execute();
 
     private:

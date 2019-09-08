@@ -6,7 +6,7 @@
 #include <condition_variable>
 #include "core/contribution-store.hpp"
 #include "util/semaphore.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 const uint32_t MATCH_QUEUE_REFILL_SIZE = 5;
 const uint32_t MATCH_QUEUE_REFILL_LIMIT = 15;

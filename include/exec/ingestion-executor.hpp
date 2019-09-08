@@ -6,7 +6,7 @@
 #include "util/semaphore.hpp"
 #include "util/elo-scorer.hpp"
 #include "core/contribution-store.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 enum ingestion_type {
     Contribution = 1,

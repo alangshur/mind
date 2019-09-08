@@ -11,9 +11,9 @@
 #include "util/rating-list.hpp"
 #include "util/iqr-scorer.hpp"
 #include "util/semaphore.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
-const elo ELO_INITIAL_RATING = 1000.0;
+const elo ELO_INITIAL_RATING = elo(ELO_STORE_SIZE) / 2.0;
 const uint32_t INITIAL_CONTRIBUTION_COUNT = 0;
 
 typedef struct {

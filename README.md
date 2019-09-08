@@ -5,7 +5,7 @@
 The following dependencies are required for coportalling and developing
 this project:
 
-- GNU g++ coportaller: `$ brew install gcc`
+- GNU g++ compiler: `$ brew install gcc`
 - GNU make: `$ brew install make`
 - Boost libraries: `$ brew install boost`  
 

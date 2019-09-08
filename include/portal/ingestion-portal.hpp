@@ -3,7 +3,7 @@
 
 #include "util/tcp-server.hpp"
 #include "exec/ingestion-executor.hpp"
-#include "definitions.hpp"
+#include "admin/definitions.hpp"
 
 const uint32_t NUM_INGESTION_REQ_PACKETS = 5;
 typedef union {

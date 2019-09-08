@@ -1,8 +1,7 @@
-#include <iostream>
-#include "orchestrator.hpp"
+#include "admin/worker.hpp"
 using namespace std;
 
-EngineOrchestrator::~EngineOrchestrator() {
+EngineWorker::~EngineWorker() {
 
     // free portal pointers
     delete this->ingestion_portal;
@@ -19,16 +18,16 @@ EngineOrchestrator::~EngineOrchestrator() {
     delete this->contribution_store;
 }
 
-void EngineOrchestrator::execute() {
+void EngineWorker::execute() {
 
-    // execute orchestrator pipeline
+    // execute worker pipeline
     try {
         this->launch_process();
         this->wait_process_shutdown();
         this->shutdown_process();
     }
     catch (exception& e) {
-        this->logger.log_error("EngineOrchestrator", "Error executing main orchestrator "
+        this->logger.log_error("EngineWorker", "Error executing main worker "
             "pipeline: " + string(e.what()) + ".");
     }
 
@@ -36,25 +35,25 @@ void EngineOrchestrator::execute() {
     exit(0);
 }
 
-void EngineOrchestrator::launch_process() {
-    this->logger.log_message("EngineOrchestrator", "Launching process.");
+void EngineWorker::launch_process() {
+    this->logger.log_message("EngineWorker", "Launching process.");
     this->build_core();
     this->build_exec();
     this->build_portal();
 }
 
-void EngineOrchestrator::wait_process_shutdown() {
-    this->logger.log_message("EngineOrchestrator", "Waiting for process shutdown.");  
+void EngineWorker::wait_process_shutdown() {
+    this->logger.log_message("EngineWorker", "Waiting for process shutdown.");  
     this->global_shutdown_sem.wait();
 }
 
-void EngineOrchestrator::shutdown_process() {
-    this->logger.log_message("EngineOrchestrator", "Shutting down process.");
+void EngineWorker::shutdown_process() {
+    this->logger.log_message("EngineWorker", "Shutting down process.");
     this->shutdown_portal();
     this->shutdown_exec();
 }
 
-void EngineOrchestrator::build_core() {
+void EngineWorker::build_core() {
 
     // build elo store 
     this->elo_store = new EngineEloStore();
@@ -63,7 +62,7 @@ void EngineOrchestrator::build_core() {
     this->contribution_store = new EngineContributionStore(*(this->elo_store));
 }
 
-void EngineOrchestrator::build_exec() {
+void EngineWorker::build_exec() {
 
     // build ingestion executor
     this->ingestion_exec = new EngineIngestionExecutor(*(this->contribution_store));
@@ -81,7 +80,7 @@ void EngineOrchestrator::build_exec() {
         { exec->run(); }, this->control_exec));
 }
 
-void EngineOrchestrator::build_portal() {
+void EngineWorker::build_portal() {
 
     // build ingestion portal
     this->ingestion_portal = new EngineIngestionPortal(*(this->ingestion_exec), INGESTION_PORT);
@@ -99,7 +98,7 @@ void EngineOrchestrator::build_portal() {
         { portal->run(); }, this->control_portal));
 }
 
-void EngineOrchestrator::shutdown_portal() {
+void EngineWorker::shutdown_portal() {
 
     // shutdown portals
     this->ingestion_portal->shutdown();
@@ -112,7 +111,7 @@ void EngineOrchestrator::shutdown_portal() {
     }
 }
 
-void EngineOrchestrator::shutdown_exec() {
+void EngineWorker::shutdown_exec() {
     
     // shutdown executors
     this->ingestion_exec->shutdown();
@@ -123,26 +122,4 @@ void EngineOrchestrator::shutdown_exec() {
     for (size_t i = 0; i < this->exec_threads.size(); i++) {
         this->exec_threads[i].join();
     }
-}
-
-#include "util/tcp-client.hpp"
-
-int main(int argc, const char* argv[]) {
-    EngineOrchestrator orchestrator;
-
-    thread t([&]() {
-        sleep(1);
-        TCPClient<control_packet_t> client;
-        control_packet_t packet;
-        packet.request.type = Shutdown;
-        packet.request.directive = ACK;
-        client.send_connection("127.0.0.1", CONTROL_PORT);
-        client.write_packet(packet);
-        client.close_connection();
-    });
-
-    orchestrator.execute();
-
-    t.join();
-    return 0;
 }
