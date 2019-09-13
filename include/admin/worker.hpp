@@ -21,7 +21,7 @@
     as assigning them to threads and monitoring these 
     child threads.
 */
-class EngineWorker : protected ShutdownThread {
+class EngineWorker : private ShutdownThread {
     public:
         ~EngineWorker();
         void execute();

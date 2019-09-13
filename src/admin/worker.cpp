@@ -19,7 +19,8 @@ EngineWorker::~EngineWorker() {
 }
 
 void EngineWorker::execute() {
-
+    this->logger.log_message("EngineWorker", "Launching engine worker.");
+    
     // execute worker pipeline
     try {
         this->launch_process();
