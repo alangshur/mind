@@ -22,22 +22,19 @@ void EngineManager::execute() {
         while (true) {
 
             // read fd input header 
-            char input_code_buf[1];
-            ssize_t bytes_read = read(this->read_fd, input_code_buf, 1);
+            char input_code;
+            ssize_t bytes_read = read(this->read_fd, &input_code, 1);
             if (bytes_read == -1) goto manager_wind_down;
 
-            // read fd input payload
-            switch (*input_code_buf) {
+            // determine response
+            write(this->write_fd, &input_code, 1);
+            switch (input_code) {
 
                 // handle shutdown
-                case '0': {
-                    write(this->write_fd, input_code_buf, 1);
-                    goto manager_wind_down;
-                }
+                case '0': goto manager_wind_down;
                 
                 // handle match request
                 case '1': {
-                    write(this->write_fd, input_code_buf, 1);
                     pair<cid, cid> match = this->get_match();
                     write(this->write_fd, &match.first, sizeof(match.first));
                     write(this->write_fd, &match.second, sizeof(match.second));
@@ -47,7 +44,6 @@ void EngineManager::execute() {
                 // handle new contribution
                 case '2': {
                     cid contribution_id;
-                    write(this->write_fd, input_code_buf, 1);
                     read(this->read_fd, &contribution_id, sizeof(contribution_id));
                     this->add_contribution(contribution_id);
                     break;
