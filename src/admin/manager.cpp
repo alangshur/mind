@@ -1,9 +1,9 @@
 #include "admin/manager.hpp"
 using namespace std;
 
-EngineManager::EngineManager(int argc, const char* argv[]) {
+EngineManager::EngineManager(int argc, const char* argv[])
+    : win_contribution_id(0) {
     try {
-
         this->populate_file_descriptors(argv);
         this->populate_worker_directory(argc, argv);    
     }
@@ -48,12 +48,30 @@ void EngineManager::execute() {
                     this->add_contribution(contribution_id);
                     break;
                 }
+
+                // handle update
+                case '3': {
+                    cid contribution_id;
+                    elo opponent_elo;
+                    bool is_winner;
+                    read(this->read_fd, &contribution_id, sizeof(contribution_id));
+                    read(this->read_fd, &opponent_elo, sizeof(opponent_elo));
+                    read(this->read_fd, &is_winner, sizeof(is_winner));
+                    this->update_contribution(contribution_id, elo(opponent_elo), is_winner);
+                    break;
+                }
+
+                // handle done request
+                case '4': {
+                    cid contribution_id = this->win_contribution_id ? this->win_contribution_id : 0;
+                    write(this->write_fd, &contribution_id, sizeof(contribution_id));
+                    break;
+                }
             }
         }
     }
     catch (exception& e) {
-        this->logger.log_error("EngineManager", "Error executing manager: " 
-            + string(e.what()));
+        this->logger.log_error("EngineManager", "Error executing manager: " + string(e.what()));
     }
 
     manager_wind_down:;
@@ -64,12 +82,21 @@ void EngineManager::execute() {
 
 pair<cid, cid> EngineManager::get_match() { 
     this->logger.log_message("EngineManager", "Fetching new match.");
-    return pair<cid, cid>(0, 0); 
+    unique_lock<mutex> lk(this->match_queue_mutex);
+    pair<cid, cid> match = this->match_queue.front();
+    this->match_queue.pop();
+    return match;
 }
 
 void EngineManager::add_contribution(cid contribution_id) {
     this->logger.log_message("EngineManager", "Adding new contribution with ID " 
         + to_string(contribution_id));
+}
+
+void EngineManager::update_contribution(cid contribution_id, elo opponent_rating, 
+    bool is_winner) {
+    this->logger.log_message("EngineManager", "Updating contribution with ID " 
+        + to_string(contribution_id) + " with " + to_string(opponent_rating)); 
 }
 
 void EngineManager::trigger_manager_shutdown() {
@@ -100,6 +127,13 @@ void EngineManager::populate_worker_directory(int argc, const char* argv[]) {
     size_t worker_count = size_t(atoi(argv[2]));
     for (size_t i = 5; i < (worker_count * 2) + 5; i++) {
         if (i % 2) last_ip_addr = string(argv[i]);
-        else this->worker_directory[last_ip_addr] = { uint32_t(atoi(argv[i])), 0 };
+        else {
+            uint32_t tier = uint32_t(atoi(argv[i]));
+            this->worker_tier_directory[tier].push_back({ 
+                tier, 
+                0, 
+                last_ip_addr 
+            });
+        }
     }
 }

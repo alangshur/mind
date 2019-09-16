@@ -13,8 +13,7 @@ const uint16_t CONTROL_PORT = 9002;
 
 // define global types
 typedef uint32_t cid;
-typedef float elo;
-typedef uint8_t distribution_rating;
+typedef double elo;
 typedef enum {
     ACK = 1,
     NAK = 2

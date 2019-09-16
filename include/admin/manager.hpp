@@ -4,7 +4,7 @@
 #include <mutex>
 #include <queue>
 #include <utility>
-#include <map>
+#include <vector>
 #include "util/logger.hpp"
 #include "core/elo-store.hpp"
 #include "core/contribution-store.hpp"
@@ -19,6 +19,7 @@
 typedef struct {
     uint32_t tier;
     uint32_t contribution_count;
+    std::string addr;
 } worker_t;
 
 /*
@@ -32,6 +33,8 @@ typedef struct {
         - 0: shutdown
         - 1: match
         - 2: contribution
+        - 3: update
+        - 4: done
 
     Input structure:
         - Header:
@@ -40,6 +43,8 @@ typedef struct {
             - shutdown: NULL (0 bytes)
             - match: NULL (0 bytes)
             - contribution: cid (4 bytes)
+            - update: cid, elo, bool (13 bytes)
+            - done: NULL (0 bytes)
 
     Output structure:
         - Header:
@@ -48,6 +53,8 @@ typedef struct {
             - shutdown: NULL (0 bytes)
             - match: cid 1, cid 2 (8 bytes)
             - contribution: NULL (0 bytes)
+            - update: NULL (0 bytes)
+            - done: cid (4 bytes)
 */
 class EngineManager : private ShutdownThread {
     public:
@@ -57,6 +64,11 @@ class EngineManager : private ShutdownThread {
     private:
         std::pair<cid, cid> get_match();
         void add_contribution(cid contribution_id);
+        void update_contribution(cid contribution_id, elo opponent_rating, 
+            bool is_winner);
+        void control_controller();
+        void match_controller();
+        void ingestion_controller();
         void trigger_manager_shutdown();
         void wait_manager_controllers();
         void force_worker_shutdown() noexcept;
@@ -65,10 +77,11 @@ class EngineManager : private ShutdownThread {
 
         std::mutex match_queue_mutex;
         std::queue<std::pair<cid, cid>> match_queue;
-        std::map<std::string, worker_t> worker_directory;
+        std::vector<std::vector<worker_t>> worker_tier_directory;
         Logger logger;
         uint32_t read_fd;
         uint32_t write_fd;
+        cid win_contribution_id;
 };
 
 #endif
