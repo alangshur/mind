@@ -16,6 +16,8 @@
 #include "portal/control-portal.hpp"
 #include "admin/definitions.hpp"
 
+const uint32_t WORKER_DIR_DEF_SIZE = 10;
+
 typedef struct {
     uint32_t tier;
     uint32_t contribution_count;

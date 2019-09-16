@@ -2,7 +2,7 @@
 using namespace std;
 
 EngineManager::EngineManager(int argc, const char* argv[])
-    : win_contribution_id(0) {
+    : win_contribution_id(0), worker_tier_directory(WORKER_DIR_DEF_SIZE) {
     try {
         this->populate_file_descriptors(argv);
         this->populate_worker_directory(argc, argv);    
